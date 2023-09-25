@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,23 +14,6 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::group([
-
-    'middleware' => 'api',
-    'prefix' => 'auth'
-
-], function ($router) {
-
-    Route::post('/login', [AuthController::class,'login']);
-    Route::post('/register', [AuthController::class,'register']);
-    Route::post('/logout', [AuthController::class,'logout']);
-    Route::post('/refresh', [AuthController::class,'refresh']);
-    Route::post('/me', [AuthController::class,'me']);
-
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
 });
-
-Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'getCategoryList']);
-Route::get('/categories/{category_slug}', [\App\Http\Controllers\CategoryController::class, 'getCategory']);
-Route::post('/categories/create', [\App\Http\Controllers\CategoryController::class, 'createCategory']);
-Route::patch('/categories/{category_slug}/update', [\App\Http\Controllers\CategoryController::class, 'updateCategory']);
-Route::delete('/categories/{category_slug}/delete', [\App\Http\Controllers\CategoryController::class, 'deleteCategory']);

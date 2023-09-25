@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="411d1d93-ad4d-4678-8899-5c09a2bbad13" name="Default Changelist" comment="" />
+    <list default="true" id="411d1d93-ad4d-4678-8899-5c09a2bbad13" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/header.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../stourism-server/app/Http/Controllers/AuthController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../stourism-server/app/Http/Controllers/AuthController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../stourism-server/app/Http/Controllers/BusinessController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../stourism-server/app/Http/Controllers/BusinessController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../stourism-server/app/Http/Controllers/CategoryController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../stourism-server/app/Http/Controllers/CategoryController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../stourism-server/database/migrations/2014_10_12_000000_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/../stourism-server/database/migrations/2014_10_12_000000_create_users_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../stourism-server/database/migrations/2023_09_23_041209_create_products_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/../stourism-server/database/migrations/2023_09_23_041209_create_products_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../stourism-server/database/migrations/2023_09_23_041449_create_business_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/../stourism-server/database/migrations/2023_09_23_041449_create_business_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../stourism-server/database/migrations/2023_09_23_093742_create_rooms_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/../stourism-server/database/migrations/2023_09_23_093742_create_rooms_table.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
   <component name="ProjectId" id="2VnI9N9yU5P0rMsv4wm3Cceeqg0" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -15,10 +35,16 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.tabs" />
+    <property name="ts.external.directory.path" value="C:\laragon\www\stourism\stourism-admin\node_modules\typescript\lib" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -31,10 +57,21 @@
       <option name="presentableId" value="Default" />
       <updated>1695465265710</updated>
       <workItem from="1695465274088" duration="603000" />
+      <workItem from="1695528829224" duration="519000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="233" y="19" key="#Vim_Emulation" timestamp="1695529338857">
+      <screen x="0" y="0" width="1280" height="720" />
+    </state>
+    <state x="233" y="19" key="#Vim_Emulation/0.0.1280.720@0.0.1280.720" timestamp="1695529338857" />
+    <state x="142" y="3" key="SettingsEditor" timestamp="1695529297758">
+      <screen x="0" y="0" width="1280" height="720" />
+    </state>
+    <state x="142" y="3" key="SettingsEditor/0.0.1280.720@0.0.1280.720" timestamp="1695529297758" />
   </component>
 </project>
