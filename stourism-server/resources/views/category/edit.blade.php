@@ -22,7 +22,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="exampleInputPassword3" class="form-label">Avatar</label>
-                                    <input type="file" name="category_image" value="{{$category->category_banner}}" class="form-control" id="exampleInputPassword3">
+                                    <input type="file" name="category_image" value="{{$category->category_image}}" class="form-control" id="exampleInputPassword3">
                                     <img id="preview-avatar" src="/images/{{$category->category_image}}" alt="Preview" style="max-width:160px; height:80px;">
                                 </div>
                                 <div class="mb-3">
@@ -30,11 +30,10 @@
                                     <input type="file" name="category_banner" value="{{$category->category_banner}}" class="form-control" id="exampleInputPassword4">
                                     <img id="preview-banner" src="/images/{{$category->category_banner}}" alt="Preview" style="max-width:160px; height:80px;">
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Mô tả</label>
-                                    <textarea name="category_description">{{$category->category_description}}</textarea>
-                                </div>
-
+                            <div class="mb-3">
+                                <label class="form-label">Mô tả</label>
+                                <textarea class="ckeditor form-control" id="editor" name="category_description">{{$category->category_description}}</textarea>
+                            </div>
                             <button type="submit" class="btn btn-primary">Cập nhật</button>
                         </form>
                     </div>
@@ -44,6 +43,9 @@
     </div>
     @endforeach
     <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script>
+        CKEDITOR.replace('editor');
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const fileInput = document.getElementById('exampleInputPassword3');
@@ -77,11 +79,11 @@
             $('#category-form').on('submit', function (e) {
                 e.preventDefault();
                 const categorySlug = $('#category-slug').val();
-                var formData = $(this).serialize();
-                console.log(formData)
+                var formData = new FormData(this);
+
                 $.ajax({
                     type: 'post',
-                    url: '/admin/danh-muc/'+categorySlug+'/cap-nhat',
+                    url: '/admin/danh-muc/' + categorySlug + '/cap-nhat',
                     data: formData,
                     processData: false,
                     contentType: false,
@@ -92,8 +94,17 @@
                     success: function (response) {
                         if (response.status === 'success') {
                             window.location.href = '/admin/danh-muc';
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            var errors = xhr.responseJSON.errors;
+                            $.each(errors, function (key, value) {
+                                showToast(value, 'error');
+                            });
                         } else {
-                            alert('Có lỗi trong quá trình cập nhật danh mục. Vui lòng thử lại.');
+                            console.log(xhr)
+                            alert('Có lỗi trong quá trình thêm mới danh mục. Vui lòng thử lại.');
                         }
                     }
                 });

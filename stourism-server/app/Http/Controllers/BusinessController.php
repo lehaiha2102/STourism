@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class BusinessController extends Controller
 {
@@ -40,7 +41,6 @@ class BusinessController extends Controller
                 $imageName = 'logo-business-'.$business_slug . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images'), $imageName);
             } else {
-                // Xử lý tệp tin không hợp lệ hoặc không được tải lên
                 $imageName = null;
             }
 
@@ -49,7 +49,6 @@ class BusinessController extends Controller
                 $bannerName = 'banner-business-'.$business_slug . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images'), $bannerName);
             } else {
-                // Xử lý tệp tin không hợp lệ hoặc không được tải lên
                 $bannerName = null;
             }
 
@@ -99,28 +98,30 @@ class BusinessController extends Controller
         return view('business.edit', compact('business', 'users'));
     }
 
-    public function businessUpdate(Request $request, $business_slug){
+    public function businessUpdate(Request $request, $business_slug)
+    {
         $business = DB::table('business')->where('business_slug', $business_slug)->first();
-        if($business){
+
+        if ($business) {
             $business_slug = Str::slug($request->business_name);
+
             $imageName = null;
             $bannerName = null;
+
             if ($request->hasFile('business_logo') && $request->file('business_logo')->isValid()) {
                 $image = $request->file('business_logo');
-                $imageName = 'logo-business-'.$business_slug . '.' . $image->getClientOriginalExtension();
+                $imageName = 'logo-business-' . $business_slug . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images'), $imageName);
             } else {
-                // Xử lý tệp tin không hợp lệ hoặc không được tải lên
-                $imageName = null;
+                $imageName = 'logo-business-' . $business_slug . '.' . pathinfo($business->business_logo, PATHINFO_EXTENSION);
             }
 
             if ($request->hasFile('business_banner') && $request->file('business_banner')->isValid()) {
                 $image = $request->file('business_banner');
-                $bannerName = 'banner-business-'.$business_slug . '.' . $image->getClientOriginalExtension();
+                $bannerName = 'banner-business-' . $business_slug . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images'), $bannerName);
             } else {
-                // Xử lý tệp tin không hợp lệ hoặc không được tải lên
-                $bannerName = null;
+                $bannerName = 'banner-business-' . $business_slug . '.' . pathinfo($business->business_banner, PATHINFO_EXTENSION);
             }
 
             $data = [
@@ -141,10 +142,11 @@ class BusinessController extends Controller
         }
     }
 
+
     public function businessDestroy($business_slug)
     {
         $business = DB::table('business')->where('business_slug', $business_slug)->first();
-        if ($business && $business->business_image && $business->business_banner) {
+        if ($business && $business->business_logo && $business->business_banner) {
             $imagePath = public_path('images/' . $business->business_logo);
             $bannerPath = public_path('images/' . $business->business_banner);
 

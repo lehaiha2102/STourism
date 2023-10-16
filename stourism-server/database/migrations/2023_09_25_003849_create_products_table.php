@@ -22,13 +22,10 @@ class CreateProductsTable extends Migration
             $table->string('product_email')->unique();
             $table->string('product_main_image');
             $table->json('product_image');
-            $table->json('business_segment');
             $table->unsignedBigInteger('business_id');
             $table->text('product_description');
             $table->boolean('product_status')->default(true);
             $table->json('product_service');
-            $table->unsignedBigInteger('category_id');
-            $table->foreign('business_id')->references('id')->on('business')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

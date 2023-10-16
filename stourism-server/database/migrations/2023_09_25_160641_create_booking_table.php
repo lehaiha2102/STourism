@@ -19,8 +19,7 @@ class CreateBookingTable extends Migration
             $table->unsignedBigInteger('room_id');
             $table->dateTime('checkin_time');
             $table->dateTime('checkout_time');
-            $table->integer('quantity')->default(1);
-            $table->boolean('booking_status')->default(false);
+            $table->integer('booking_status')->default(1);
             $table->boolean('advance_payment_check')->default(false);
             $table->double('advance_payment')->default(0);
             $table->foreign('booker')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');

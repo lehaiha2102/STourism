@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -20,16 +21,41 @@ class AuthController extends Controller
 
     public function registerPost(Request $request)
     {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $chars_length = strlen($chars);
+        $random_string = '';
+        for ($i = 0; $i < 10; $i++) {
+            $random_char = $chars[rand(0, $chars_length - 1)];
+            $random_string .= $random_char;
+        }
         $data = [
             'full_name' => $request->full_name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
+            'active_key' => $random_string,
         ];
 
         DB::table('users')->insert([$data]);
 
+        $email = $request->input('email');
+        $active_token = $random_string;
+        dispatch(new SendEmail($email, $active_token));
+
         return response()->json(['status' => 'success']);
+    }
+
+    public function verify($email, $active_token){
+        $user = DB::table('users')->where('email', $email)->first();
+        if($user->email == $email){
+            if($user->active_token == $active_token){
+                return response()->json(['status' => 'success']);
+            } else{
+                return response()->json(['status' => 'fail']);
+            }
+        } else{
+            return response()->json(['status' => 'fail', 'messenger' => 'email not found']);
+        }
     }
 
     public function login(){

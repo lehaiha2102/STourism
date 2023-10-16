@@ -77,21 +77,30 @@
             $('#category-form').on('submit', function (e) {
                 e.preventDefault();
                 var formData = new FormData(this);
-                console.log(formData);
                 $.ajax({
                     type: 'POST',
                     url: '/admin/danh-muc/them-moi',
                     data: formData,
-                    processData: false,  // Không xử lý dữ liệu
-                    contentType: false,  // Không đặt kiểu dữ liệu
+                    processData: false,
+                    contentType: false,
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                         'Accept': 'application/json'
                     },
                     success: function (response) {
                         if (response.status === 'success') {
+                            showToast('Thao tác thành công', 'success');
                             window.location.href = '/admin/danh-muc';
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            var errors = xhr.responseJSON.errors;
+                            $.each(errors, function (key, value) {
+                                showToast(value, 'error');
+                            });
                         } else {
+                            console.log(xhr)
                             alert('Có lỗi trong quá trình thêm mới danh mục. Vui lòng thử lại.');
                         }
                     }

@@ -26,12 +26,16 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Diện tích</label>
+                                <label for="exampleInputEmail1" class="form-label">Diện tích (m2)</label>
                                 <input type="number" name="room_area" class="form-control" id="exampleInputEmail1">
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Số lượng</label>
                                 <input type="number" name="room_quantity" class="form-control" id="exampleInputEmail1">
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Giá phòng</label>
+                                <input type="number" name="room_rental_price" class="form-control" id="exampleInputEmail1">
                             </div>
                             <div class="mb-3">
                                 <label for="disabledSelect12" class="form-label">Thuộc sở hữu</label>
@@ -43,7 +47,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Địa chỉ</label>
-                                <input type="text" name="product_address" class="form-control" id="exampleInputEmail1">
+                                <input type="text" name="room_address" class="form-control" id="exampleInputEmail1">
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputPassword3" class="form-label">Khả dụng(người)</label>

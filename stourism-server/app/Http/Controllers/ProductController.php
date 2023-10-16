@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductEditRequest;
+use App\Http\Requests\ProductRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -11,10 +14,10 @@ class ProductController extends Controller
 {
     public function index(){
         $products = DB::table('products')
-            ->join('business', 'business.id', '=', 'products.business_id')
-            ->select('products.*', 'business.business_name')
             ->paginate(50);
-        return view('product.index', compact('products'));
+        $business = DB::table('business')->get();
+        $categories_product = DB::table('categories_product')->get();
+        return view('product.index', compact('products', 'business', 'categories_product'));
     }
 
     public function newProduct(){
@@ -23,17 +26,8 @@ class ProductController extends Controller
         return view('product.new', compact('categories','business'));
     }
 
-    public function newProductPost(Request $request)
+    public function newProductPost(ProductRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'product_name' => 'required|string|max:255',
-            'product_slug' => 'string|max:255|unique:products',
-            'product_status' => 'required',
-            'product_main_image' => 'image|mimes:jpeg,png,jpg,gif',
-        ]);
-
-        if ($validator->passes()) {
-            // Xử lý tệp hình ảnh chính
             $imageName = null;
             if ($request->hasFile('product_main_image') && $request->file('product_main_image')->isValid()) {
                 $image = $request->file('product_main_image');
@@ -51,7 +45,6 @@ class ProductController extends Controller
                 }
             }
 
-            // Lưu dữ liệu vào cơ sở dữ liệu
             $data = [
                 'product_name' => $request->product_name,
                 'product_slug' => Str::slug($request->product_name),
@@ -73,15 +66,110 @@ class ProductController extends Controller
                 DB::table('categories_product')->insert([
                     'product_id' => $product_id,
                     'category_id' => $cate,
-                ]); // Add a closing parenthesis here
+                ]);
             }
 
             return response()->json(['status' => 'success']);
-        }
-
-        $errors = $validator->errors()->all();
-        return response()->json(['errors' => $errors], 500);
     }
 
+    public function productEdit($product_slug){
+        $product = DB::table('products')->where('product_slug', $product_slug)->first();
+        $categories = DB::table('categories')->get();
+        $business = DB::table('business')->get();
+        $categories_product = DB::table('categories_product')->where('product_id', $product->id)->get();
+        return view('product.edit', compact('product', 'categories', 'business', 'categories_product'));
+    }
 
+    public function productUpdate(ProductEditRequest $request, $product_slug){
+        $product = DB::table('products')->where('product_slug', $product_slug)->first();
+        $product_slug_new = Str::slug($request->product_name);
+        $imageName = null;
+        if ($request->hasFile('product_main_image') && $request->file('product_main_image')->isValid()) {
+            $image = $request->file('product_main_image');
+            $imageName = 'product-main-image-' . $product_slug_new . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+        } else{
+            $imageName = $product->product_main_image;
+        }
+
+        $uploadImages = [];
+        if ($request->hasFile('product_image')) {
+            foreach ($request->file('product_image') as $index => $image) {
+                $imageFileName = 'product-image-' . $index+1 . '-' . $product_slug_new . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('images'), $imageFileName);
+                $uploadImages[] = $imageFileName;
+            }
+        } else{
+            $uploadImages = $product->product_image;
+        }
+
+        $data = [
+            'product_name' => $request->product_name,
+            'product_slug' => Str::slug($request->product_name),
+            'product_address' => $request->product_address,
+            'product_phone' => $request->product_phone,
+            'product_email' => $request->product_email,
+            'product_main_image' => $imageName,
+            'product_image' => json_encode($uploadImages),
+            'business_id' => $request->business_id,
+            'product_description' => $request->product_description,
+            'product_status' => $request->product_status,
+            'product_service' => json_encode($request->product_service),
+        ];
+
+        DB::table('products')->where('product_slug', $product_slug)->update($data);
+        return response()->json(['status' => 'success']);
+    }
+
+    public function productDestroy($product_slug)
+    {
+        $product = DB::table('products')->where('product_slug', $product_slug)->first();
+        if ($product) {
+            $imagePath = public_path('images/' . $product->product_main_image);
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+            }
+
+            $imagePaths = json_decode($product->product_image, true);
+
+            foreach ($imagePaths as $index => $image) {
+                $imagePath = public_path('images/' . $image);
+
+                if (File::exists($imagePath)) {
+                    File::delete($imagePath);
+                }
+            }
+
+            DB::table('products')->where('product_slug', $product_slug)->delete();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Xóa sản phẩm thành công.'
+            ]);
+        } else{
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Không tìm thấy danh mục.'
+            ]);
+        }
+    }
+
+    public function productStatus(Request $request)
+    {
+        $product = DB::table('products')->where('id', $request->product_id)->first();
+
+        if ($product) {
+            $new_status = $product->product_status == 1 ? 0 : 1;
+            DB::table('products')->where('id', $request->product_id)->update(['product_status' => $new_status]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật trạng thái thành công.'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy sản phẩm này.'
+            ]);
+        }
+    }
 }

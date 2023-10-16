@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\BookingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,7 @@ Route::get('/admin/dang-ky', [AuthController::class, 'register'])->name('registe
 Route::get('/admin/dang-nhap', [AuthController::class, 'login'])->name('login');
 Route::post('/admin/dang-ky', [AuthController::class, 'registerPost']);
 Route::post('/admin/dang-nhap', [AuthController::class, 'loginPost']);
+Route::get('verify-email/{email}/{active_key}', [AuthController::class, 'verify'])->name('verify');// send mail is not active
 
 Route::get('/admin/danh-muc', [CategoryController::class, 'index'])->name('category');
 Route::get('/admin/danh-muc/them-moi', [CategoryController::class, 'newCategory'])->name('category.new');
@@ -55,3 +57,12 @@ Route::get('/admin/phong/{room_slug}/chinh-sua', [RoomController::class, 'roomEd
 Route::post('/admin/phong/{room_slug}/cap-nhat', [RoomController::class, 'roomUpdate'])->name('room.patch');
 Route::delete('/admin/phong/{room_slug}/xoa', [RoomController::class, 'roomDestroy'])->name('room.destroy');
 Route::post('/admin/phong/cap-nhat-trang-thai', [RoomController::class, 'roomStatus'])->name('room.change-status');
+
+Route::get('/admin/dat-cho', [BookingController::class, 'index'])->name('booking');
+Route::get('/admin/dat-cho/them-moi', [BookingController::class, 'newBooking'])->name('booking.new');
+Route::post('/admin/dat-cho/them-moi', [BookingController::class, 'newBookingPost'])->name('booking.post');
+Route::get('/admin/dat-cho/{bookingId}/chinh-sua', [BookingController::class, 'bookingEdit'])->name('booking.edit');
+Route::post('/admin/dat-cho/{bookingId}/cap-nhat', [BookingController::class, 'bookingUpdate'])->name('booking.patch');
+Route::delete('/admin/dat-cho/{bookingId}/xoa', [BookingController::class, 'bookingDestroy'])->name('booking.destroy');
+Route::post('/admin/dat-cho/cap-nhat-trang-thai', [BookingController::class, 'bookingStatus'])->name('booking.change-status');
+Route::post('/admin/dat-cho/huy-dat-phong', [BookingController::class, 'cancelBooking'])->name('booking.cancel_booking');

@@ -1,12 +1,13 @@
 @extends('component.index')
 @section('content')
-    @foreach($business as $index => $b)
+
         <div class="container-fluid">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title fw-semibold mb-4">Chỉnh sửa thông tin doanh nghiệp</h5>
                     <div class="card">
                         <div class="card-body">
+                            @foreach($business as $index => $b)
                             <form id="business-form" enctype="multipart/form-data">
                                 <div class="mb-3">
                                     <label for="exampleInputEmail1" class="form-label">Tên doanh nghiệp</label>
@@ -62,12 +63,12 @@
                                 </div>
                                 <button type="submit" class="btn btn-primary">Thêm mới</button>
                             </form>
+                            @endforeach
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    @endforeach
     <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -102,8 +103,7 @@
             $('#business-form').on('submit', function (e) {
                 e.preventDefault();
                 const businessSlug = $('#business-slug').val();
-                var formData = $(this).serialize();
-                console.log(formData)
+                var formData = new FormData(this);
                 $.ajax({
                     type: 'post',
                     url: '/admin/doanh-nghiep/'+businessSlug+'/cap-nhat',

@@ -96,7 +96,7 @@
                     </div>
                     <div class="modal-body">
                         <p class="mb-0">Bạn có chắc chắn muốn xóa <span style="color:red">{{$b->business_name}}</span>?</p>
-                        <form id="delete-b">
+                        <form id="delete-business">
                             <input class="my-3" type="hidden" name="id" id="business_slug_delete" value="{{$b->business_slug}}">
                             <button class="btn btn-danger my-3" type="submit">Xóa</button>
                         </form>
@@ -143,18 +143,17 @@
             $('#delete-business').on('submit', function (e) {
                 e.preventDefault();
                 var businessSlug = $('#business_slug_delete').val();
-                var formData = $(this).serialize();
 
                 $.ajax({
                     type: 'DELETE',
                     url: '/admin/doanh-nghiep/'+ businessSlug +'/xoa',
-                    data: formData,
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                         'Accept': 'application/json'
                     },
                     success: function (response) {
                         if(response.status === 'success'){
+                            alert('xóa thành công');
                             window.location.href = '/admin/doanh-nghiep';
                         }
                     }

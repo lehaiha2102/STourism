@@ -60,6 +60,14 @@
               <span class="hide-menu">Doanh nghiệp</span>
             </a>
           </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="{{ route('booking') }}" aria-expanded="false">
+              <span>
+                <i class="ti ti-file-description"></i>
+              </span>
+                    <span class="hide-menu">Đặt chỗ</span>
+                </a>
+            </li>
           <li class="sidebar-item">
             <a class="sidebar-link" href="#" aria-expanded="false">
               <span>

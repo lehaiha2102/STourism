@@ -19,16 +19,10 @@
                     <h6 class="fw-semibold mb-0">Tên</h6>
                   </th>
                   <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Slug</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Avatar</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Banner</h6>
+                    <h6 class="fw-semibold mb-0">Ảnh</h6>
                   </th>
                     <th class="border-bottom-0">
-                        <h6 class="fw-semibold mb-0 d-flex align-items-center justify-content-center">Trạng thái</h6>
+                        <h6 class="fw-semibold w-100 mb-0 d-flex align-items-center justify-content-center">Trạng thái</h6>
                     </th>
                   <th class="border-bottom-0">
                     {{-- some thing --}}
@@ -43,21 +37,15 @@
                       <h6 class="fw-semibold mb-1">{{ $category->category_name }}</h6>
                   </td>
                   <td class="border-bottom-0">
-                    <p class="mb-0 fw-normal">{{ $category->category_slug }}</p>
-                  </td>
-                  <td class="border-bottom-0">
                       <img src="/images/{{ $category->category_image }}" alt="category-avatar-{{ $category->category_slug }}" width="80">
                   </td>
-                  <td class="border-bottom-0">
-                      <img src="/images/{{ $category->category_banner }}" alt="category-banner-{{ $category->category_slug }}" width="80">
-                  </td>
                     <td class="border-bottom-0 status-toggle" data-category-id="{{ $category->id }}" data-status="{{ $category->category_status }}" >
-                        {!! $category->category_status == 1 ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Còn hoạt động</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Tạm ngừng hoạt động</span>' !!}
+                        {!! $category->category_status == 1 ? '<span class="badge w-100 bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Còn hoạt động</span>' : '<span class="badge w-100 bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Tạm ngừng hoạt động</span>' !!}
                     </td>
                     <td class="border-bottom-0">
                         <a class="btn btn-outline-warning m-1" href="{{ route('category.edit', ['category_slug' => $category->category_slug])  }}">Chỉnh sửa</a>
                         <button type="button" class="btn btn-outline-danger m-1" data-id="{{$category->id}}" data-toggle="modal" data-target="#exampleModal{{$category->id}}">
-                            <i class="pe-7s-trash"></i>
+                           Xóa
                         </button>
                     </td>
                 </tr>
@@ -108,12 +96,9 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        var newStatusHtml = new_status == 1 ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Còn hoạt động</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Tạm ngừng hoạt động</span>';
+                        var newStatusHtml = new_status == 1 ? '<span class="badge bg-success rounded-3 w-100 fw-semibold d-flex align-items-center justify-content-center">Còn hoạt động</span>' : '<span class="badge w-100 bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Tạm ngừng hoạt động</span>';
                         $('.status-toggle[data-category-id="' + category_id + '"]').data('status', new_status);
                         $('.status-toggle[data-category-id="' + category_id + '"]').html(newStatusHtml);
-                        alert(response.message);
-                    } else {
-                        alert(response.message);
                     }
                 },
             });
@@ -125,12 +110,13 @@
         $('#delete-category').on('submit', function (e) {
             e.preventDefault();
             var categorySlug = $('#category_slug_delete').val();
-            var formData = $(this).serialize();
-
+            var formData = new FormData(this);
             $.ajax({
                 type: 'DELETE',
                 url: '/admin/danh-muc/'+ categorySlug +'/xoa',
                 data: formData,
+                processData: false,
+                contentType: false,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                     'Accept': 'application/json'
@@ -144,4 +130,5 @@
         });
     });
 </script>
+
 @endsection
