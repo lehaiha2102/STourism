@@ -33,7 +33,29 @@ class ProductController extends Controller
         return response()->json(['data' => $data]);
     }
 
-    public function searchRoom(){
-        
+    public function searchRoom(Request $request){
+        $province = $request->province;
+        $service = $request->category;
+
+        $data = DB::table('rooms')
+            ->join('products', 'products.id', '=', 'rooms.product_id')
+            ->join('categories_product', 'categories_product.product_id', '=', 'products.id')
+            ->join('categories', 'categories.id', '=', 'categories_product.category_id')
+            ->join('ward', 'ward.id', '=', 'products.ward_id')
+            ->join('district', 'district.id', '=', 'ward.district_id')
+            ->join('province', 'province.id', '=', 'district.province_id')
+            ->select('rooms.*', 'products.*')
+            ->where('province.id', '=', $province)
+            ->where('categories.id', '=', $service)
+            ->paginate(30);
+        if($data){
+            return response()->json([
+                'data' => $data
+            ]);
+        } else{
+            return response()->json([
+                'messenger' => 'Không tìm thấy dịch vụ cần tìm'
+            ]);
+        }
     }
 }

@@ -7,6 +7,7 @@ function IndexPage() {
   const [hotelProductList, setHotelProductList] = useState([]);
   const [foodProductList, setFoodProductList] = useState([]);
   const [provinceList, setProvinceList] = useState([]);
+  const [search, setSearch] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,14 +92,12 @@ function IndexPage() {
     event.preventDefault();
     const selectedProvince = event.target.elements.province.value;
     const selectedCategory = event.target.elements.category.value;
-    const selectedNumberOfPeople = event.target.elements.numberOfPeople.value;
-    const selectedCheckInDate = event.target.elements.checkInDate.value;
-    if (!selectedProvince || !selectedCategory || !selectedNumberOfPeople || !selectedCheckInDate) {
+    if (!selectedProvince || !selectedCategory) {
       console.error('Please fill in all required fields');
       return;
     }
     try {
-      const res = await fetch('http://your-api-url/search', {
+      const res = await fetch('http://127.0.0.1:8000/api/v2/rooms/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,15 +105,12 @@ function IndexPage() {
         body: JSON.stringify({
           province: selectedProvince,
           category: selectedCategory,
-          numberOfPeople: selectedNumberOfPeople,
-          checkInDate: selectedCheckInDate,
-        }),
+          }),
       });
 
       if (res.ok) {
-        const data = await res.json();
-        // Handle the response data as needed
-        console.log(data);
+        const dataSearch = await res.json();
+        setSearch(dataSearch.data.data)
       } else {
         console.error('Error fetching data:', res.statusText);
       }
@@ -123,7 +119,8 @@ function IndexPage() {
     }
   };
 
-
+  console.log(search)
+  // @ts-ignore
   return (
     <Layout title="Home | Next.js + TypeScript">
       <div className="container-xxl bg-white p-0">
@@ -172,7 +169,7 @@ function IndexPage() {
                 <div className="row g-2">
                   <div className="col-md-10">
                     <div className="row g-2">
-                      <div className="col-md-3">
+                      <div className="col-md-5">
                         <select className="form-select" defaultValue="" name="province">
                           <option selected>Khu vực</option>
                           {provinceList ? (
@@ -186,30 +183,16 @@ function IndexPage() {
                           )}
                         </select>
                       </div>
-                      <div className="col-md-3">
+                      <div className="col-md-5">
                         <select className="form-select" defaultValue="" name="category">
                           <option selected>Dịch vụ</option>
                           {categoryList.map((category, index) => (
-                            <option key={index} value={category.category_slug}>
+                            <option key={index} value={category.id}>
                               {category.category_name}
                             </option>
                           ))}
 
                         </select>
-                      </div>
-                      <div className="col-md-3">
-                        <select className="form-select" defaultValue="" name="numberOfPeople">
-                          <option selected>Số lượng người</option>
-                          <option value="1">1 người</option>
-                          <option value="2">2 người</option>
-                          <option value="3">5 người</option>
-                          <option value="4">Trên 5 người</option>
-                        </select>
-                      </div>
-                      <div className="col-md-3">
-                        <div className="date" id="date1" data-target-input="nearest">
-                          <input type="datetime-local" className="form-control" placeholder="Check in" name="checkInDate" />
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -221,6 +204,66 @@ function IndexPage() {
             </div>
           </div>
         </div>
+        {Array.isArray(search) ? (
+            <div className="container-xxl py-5">
+              <div className="container">
+                <div className="text-center wow fadeInUp" data-wow-delay="0.1s">
+                  <h1 className="mb-5">Thông tin khớp với kết quả tìm kiếm của bạn</h1>
+                </div>
+                <div className="row g-4">
+                  {search.map((room, index) => (
+                      <div
+                          className={`col-lg-4 col-md-6 wow fadeInUp`}
+                          data-wow-delay={`${0.1 * (index + 1)}s`}
+                          key={index}
+                      >
+                        <div className="room-item shadow rounded overflow-hidden">
+                          <div className="position-relative">
+                            {room.room_image && room.room_image.length > 0 && (
+                                <div className="position-relative">
+                                  <img
+                                      className="img-fluid"
+                                      src={`http://127.0.0.1:8000/images/${JSON.parse(room.room_image)[0]}`}
+                                      alt=''
+                                      style={{
+                                        height: '200px',
+                                        width: '100%'
+                                      }}
+                                  />
+                                </div>
+                            )}
+                          </div>
+                          <div className="p-4 mt-2">
+                            <div className="d-flex flex-column justify-content-center align-items-center mb-3">
+                              <h5 className="mb-0">{room.room_name}</h5>
+                              <div className="d-flex justify-content-center my-3">
+                                <small className="fa fa-star text-primary"></small>
+                                <small className="fa fa-star text-primary"></small>
+                                <small className="fa fa-star text-primary"></small>
+                                <small className="fa fa-star text-primary"></small>
+                                <small className="fa fa-star text-primary"></small>
+                              </div>
+                            </div>
+                            <p className="text-body mb-3"><i className="fa fa-map-marker-alt me-3"></i>{room.product_name}, {room.product_address}</p>
+                            <p className="text-body mb-3"><i className="fa fa-phone-alt me-3"></i> {room.product_phone}</p>
+                            <div className="d-flex justify-content-center">
+                              <Link className="btn btn-sm btn-primary rounded py-2 px-4" href={`/phong/${room.room_slug || ''}`}>
+                                Xem chi tiết
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  ))}
+                </div>
+                <div className="text-center wow fadeInUp mt-5" data-wow-delay="0.1s">
+                  <a className="btn btn-primary py-3 px-5 mt-2" href="">Xem thêm</a>
+                </div>
+              </div>
+            </div>
+        ) : (
+            ''
+        )}
         <div className="container-xxl py-5">
           <div className="container">
             <div className="row g-5 align-items-center">

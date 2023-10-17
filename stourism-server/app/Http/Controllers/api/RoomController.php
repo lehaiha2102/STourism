@@ -26,7 +26,12 @@ class RoomController extends Controller
     }
 
     public function getRoom($slug){
-        $data = DB::table('rooms')->where('room_slug', $slug)->first();
+        $data = DB::table('rooms')
+            ->join('products', 'products.id', '=', 'rooms.product_id')
+            ->select('rooms.*', 'products.*')
+            ->where('rooms.room_slug', $slug)
+            ->first();
+
         return response()->json(['data' => $data]);
     }
 }
