@@ -25,12 +25,20 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="disabledSelect" class="form-label">Tình trạng</label>
+                                <label for="disabledSelect" class="form-label">Tình trạng đặt phòng</label>
                                 <select id="disabledSelect" name="booking_status" class="form-select">
-                                    <option value="1">Hoạt động</option>
-                                    <option value="0">Tạm ngừng</option>
+                                    <option value="confirmed">Đã xác nhận</option>
+                                    <option value="unconfirmed">Chưa xác nhận</option>
+                                    <option value="cancelled">Hủy</option>
+                                    <option value="completed">Hoàn thành</option>
+                                    <option value="unpaid">Chưa thanh toán</option>
+                                    <option value="paid">Đã thanh toán</option>
+                                    <option value="in_use">Sử dụng</option>
+                                    <option value="overdue">Quá hạn</option>
+                                    <option value="pending_confirmation">Chờ xác nhận</option>
+                                    <option value="rejected">Từ chối</option>
                                 </select>
-                            </div>
+                            </div>                            
                             <div class="mb-3">
                                 <label for="exampleInputEmail12" class="form-label">Thời gian đến</label>
                                 <input type="datetime-local" name="checkin_time" class="form-control" id="exampleInputEmail12">
@@ -66,17 +74,17 @@
                 console.log(formData);
                 $.ajax({
                     type: 'POST',
-                    url: '/admin/thue-phong/them-moi',
+                    url: '/admin/dat-cho/them-moi',
                     data: formData,
-                    processData: false,  // Không xử lý dữ liệu
-                    contentType: false,  // Không đặt kiểu dữ liệu
+                    processData: false,
+                    contentType: false,
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                         'Accept': 'application/json'
                     },
                     success: function (response) {
                         if (response.status === 'success') {
-                            window.location.href = '/admin/thue-phong';
+                            window.location.href = '/admin/dat-cho';
                         } else {
                             alert('Có lỗi trong quá trình thêm mới doanh nghiệp. Vui lòng thử lại.');
                         }

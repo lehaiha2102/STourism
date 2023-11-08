@@ -1,6 +1,18 @@
 @extends('component.index')
 @section('content')
-<div class="row">
+    <h1>Danh sách Session:</h1>
+    <ul>
+        @foreach(session()->all() as $key => $value)
+            <li><strong>{{ $key }}:</strong>
+                @if(is_string($value))
+                    {{ $value }}
+                @else
+                    {{ var_dump($value) }}
+                @endif
+            </li>
+        @endforeach
+    </ul>
+    <div class="row">
   <div class="col-lg-8 d-flex align-items-strech">
     <div class="card w-100">
       <div class="card-body">
@@ -142,7 +154,7 @@
               <span class="timeline-badge border-2 border border-danger flex-shrink-0 my-8"></span>
               <span class="timeline-badge-border d-block flex-shrink-0"></span>
             </div>
-            <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New arrival recorded 
+            <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New arrival recorded
             </div>
           </li>
           <li class="timeline-item d-flex position-relative overflow-hidden">
@@ -186,7 +198,7 @@
                 <td class="border-bottom-0"><h6 class="fw-semibold mb-0">1</h6></td>
                 <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-1">Sunil Joshi</h6>
-                    <span class="fw-normal">Web Designer</span>                          
+                    <span class="fw-normal">Web Designer</span>
                 </td>
                 <td class="border-bottom-0">
                   <p class="mb-0 fw-normal">Elite Admin</p>
@@ -199,12 +211,12 @@
                 <td class="border-bottom-0">
                   <h6 class="fw-semibold mb-0 fs-4">$3.9</h6>
                 </td>
-              </tr> 
+              </tr>
               <tr>
                 <td class="border-bottom-0"><h6 class="fw-semibold mb-0">2</h6></td>
                 <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-1">Andrew McDownland</h6>
-                    <span class="fw-normal">Project Manager</span>                          
+                    <span class="fw-normal">Project Manager</span>
                 </td>
                 <td class="border-bottom-0">
                   <p class="mb-0 fw-normal">Real Homes WP Theme</p>
@@ -217,12 +229,12 @@
                 <td class="border-bottom-0">
                   <h6 class="fw-semibold mb-0 fs-4">$24.5k</h6>
                 </td>
-              </tr> 
+              </tr>
               <tr>
                 <td class="border-bottom-0"><h6 class="fw-semibold mb-0">3</h6></td>
                 <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-1">Christopher Jamil</h6>
-                    <span class="fw-normal">Project Manager</span>                          
+                    <span class="fw-normal">Project Manager</span>
                 </td>
                 <td class="border-bottom-0">
                   <p class="mb-0 fw-normal">MedicalPro WP Theme</p>
@@ -235,12 +247,12 @@
                 <td class="border-bottom-0">
                   <h6 class="fw-semibold mb-0 fs-4">$12.8k</h6>
                 </td>
-              </tr>      
+              </tr>
               <tr>
                 <td class="border-bottom-0"><h6 class="fw-semibold mb-0">4</h6></td>
                 <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-1">Nirav Joshi</h6>
-                    <span class="fw-normal">Frontend Engineer</span>                          
+                    <span class="fw-normal">Frontend Engineer</span>
                 </td>
                 <td class="border-bottom-0">
                   <p class="mb-0 fw-normal">Hosting Press HTML</p>
@@ -253,7 +265,7 @@
                 <td class="border-bottom-0">
                   <h6 class="fw-semibold mb-0 fs-4">$2.4k</h6>
                 </td>
-              </tr>                       
+              </tr>
             </tbody>
           </table>
         </div>

@@ -27,6 +27,8 @@ class BookingController extends Controller
             'checkout_time' => $request->checkout_time,
             'advance_payment_check' => $request->advance_payment_check,
             'advance_payment' => $request->advance_payment,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
         return response()->json(['status' => 'success']);
     }
@@ -50,6 +52,7 @@ class BookingController extends Controller
                 'checkout_time' => $request->checkout_time,
                 'advance_payment_check' => $request->advance_payment_check,
                 'advance_payment' => $request->advance_payment,
+                'updated_at' => now(),
             ]);
             return response()->json(['status' => 'success']);
         } else{

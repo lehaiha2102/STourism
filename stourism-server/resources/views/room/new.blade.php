@@ -3,32 +3,15 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title fw-semibold mb-4">Thêm mới phòng & bàn</h5>
+                <h5 class="card-title fw-semibold mb-4">Thêm mới phòng</h5>
                 <div class="card">
                     <div class="card-body">
                         <form id="room-form" enctype="multipart/form-data">
                             <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Tên phòng(bàn)</label>
+                                <label for="exampleInputEmail1" class="form-label">Tên phòng</label>
                                 <input type="text" name="room_name" class="form-control" id="exampleInputEmail1">
                             </div>
-                            <div class="mb-3">
-                                <label for="disabledSelect" class="form-label">Tình trạng</label>
-                                <select id="disabledSelect" name="room_status" class="form-select">
-                                    <option value="1">Hoạt động</option>
-                                    <option value="0">Tạm ngừng</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="disabledSelect" class="form-label">Loại phòng(bàn)</label>
-                                <select id="disabledSelect" name="room_type" class="form-select">
-                                    <option value="1">Vip</option>
-                                    <option value="0">Private</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Diện tích (m2)</label>
-                                <input type="number" name="room_area" class="form-control" id="exampleInputEmail1">
-                            </div>
+                
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Số lượng</label>
                                 <input type="number" name="room_quantity" class="form-control" id="exampleInputEmail1">
@@ -46,12 +29,12 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Địa chỉ</label>
-                                <input type="text" name="room_address" class="form-control" id="exampleInputEmail1">
+                                <label for="exampleInputPassword3" class="form-label">Số lượng người lớn tối đa</label>
+                                <input type="number" name="adult_capacity" class="form-control" id="exampleInputPassword3">
                             </div>
                             <div class="mb-3">
-                                <label for="exampleInputPassword3" class="form-label">Khả dụng(người)</label>
-                                <input type="number" name="room_capacity" class="form-control" id="exampleInputPassword3">
+                                <label for="exampleInputPassword12" class="form-label">Số lượng trẻ em tối đa</label>
+                                <input type="number" name="children_capacity" class="form-control" id="exampleInputPassword12">
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputPassword4" class="form-label">Bộ sưu tập ảnh</label>

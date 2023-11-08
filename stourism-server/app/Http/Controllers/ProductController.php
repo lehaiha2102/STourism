@@ -13,11 +13,34 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
     public function index(){
-        $products = DB::table('products')
-            ->paginate(50);
-        $business = DB::table('business')->get();
-        $categories_product = DB::table('categories_product')->get();
-        return view('product.index', compact('products', 'business', 'categories_product'));
+        if (session('user')) {
+            $user = session('user')->id;
+            $role_id = session('permission')->role_id;
+
+            if ($role_id == 1) {
+                $products = DB::table('products')->paginate(50);
+            } elseif ($role_id == 2) {
+                $products = DB::table('products')
+                    ->join('business', 'products.business_id', '=', 'business.id')
+                    ->join('users', 'business.user_id', '=', 'users.id')
+                    ->where('users.id', '=', $user)
+                    ->paginate(50);
+            }
+
+            $business = DB::table('business')
+                ->join('users', 'business.user_id', '=', 'users.id')
+                ->where('users.id', '=', $user)
+                ->get();
+            $categories_product = DB::table('categories_product')
+                ->join('products', 'products.id', '=', 'categories_product.product_id')
+                ->join('business', 'products.business_id', '=', 'business.id')
+                ->join('users', 'business.user_id', '=', 'users.id')
+                ->where('users.id', '=', $user)
+                ->get();
+            return view('product.index', compact('products', 'business', 'categories_product'));
+        } else {
+            return redirect('/loginView');
+        }
     }
 
     public function newProduct(){
@@ -31,7 +54,7 @@ class ProductController extends Controller
             $imageName = null;
             if ($request->hasFile('product_main_image') && $request->file('product_main_image')->isValid()) {
                 $image = $request->file('product_main_image');
-                $imageName = 'product-main-image-' . Str::slug($request->product_name) . '.' . $image->getClientOriginalExtension();
+                $imageName = 'image-' .time() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images'), $imageName);
             }
 
@@ -39,7 +62,7 @@ class ProductController extends Controller
             $uploadImages = [];
             if ($request->hasFile('product_image')) {
                 foreach ($request->file('product_image') as $index => $image) {
-                    $imageFileName = 'product-image-' . $index+1 . '-' . Str::slug($request->product_name) . '.' . $image->getClientOriginalExtension();
+                    $imageFileName = 'image-'  .time() . '.' . $image->getClientOriginalExtension();
                     $image->move(public_path('images'), $imageFileName); // Lưu tệp trong thư mục storage
                     $uploadImages[] = $imageFileName;
                 }
@@ -86,7 +109,7 @@ class ProductController extends Controller
         $imageName = null;
         if ($request->hasFile('product_main_image') && $request->file('product_main_image')->isValid()) {
             $image = $request->file('product_main_image');
-            $imageName = 'product-main-image-' . $product_slug_new . '.' . $image->getClientOriginalExtension();
+            $imageName = 'image-'  .time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images'), $imageName);
         } else{
             $imageName = $product->product_main_image;
@@ -95,7 +118,7 @@ class ProductController extends Controller
         $uploadImages = [];
         if ($request->hasFile('product_image')) {
             foreach ($request->file('product_image') as $index => $image) {
-                $imageFileName = 'product-image-' . $index+1 . '-' . $product_slug_new . '.' . $image->getClientOriginalExtension();
+                $imageFileName = 'image-'.time() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images'), $imageFileName);
                 $uploadImages[] = $imageFileName;
             }
@@ -118,6 +141,15 @@ class ProductController extends Controller
         ];
 
         DB::table('products')->where('product_slug', $product_slug)->update($data);
+
+        $categories_id = $request->category_id;
+        DB::table('categories_product')->where('product_id', $product->id)->delete();
+        foreach ($categories_id as $cate) {
+            DB::table('categories_product')->insert([
+                'product_id' => $product->id,
+                'category_id' => $cate,
+            ]);
+        }
         return response()->json(['status' => 'success']);
     }
 

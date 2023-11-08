@@ -24,9 +24,7 @@
                                 <th class="border-bottom-0">
                                     <h6 class="fw-semibold mb-0">Chủ sở hữu</h6>
                                 </th>
-                                <th class="border-bottom-0">
-                                    <h6 class="fw-semibold mb-0">Mảng kinh doanh</h6>
-                                </th>
+            
                                 <th class="border-bottom-0">
                                     <h6 class="fw-semibold mb-0 d-flex align-items-center justify-content-center">Trạng thái</h6>
                                 </th>
@@ -49,13 +47,6 @@
                                         @foreach($business as $b)
                                             @if($product->business_id == $b->id)
                                                 <h6 class="fw-semibold mb-1">{{ $b->business_name }}</h6>
-                                            @endif
-                                        @endforeach
-                                    </td>
-                                    <td class="border-bottom-0">
-                                        @foreach($categories_product as $cp)
-                                            @if($product->id == $cp->product_id)
-                                                <h6 class="fw-semibold mb-1">{{ $cp->category_id }}</h6>
                                             @endif
                                         @endforeach
                                     </td>

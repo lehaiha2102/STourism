@@ -31,7 +31,6 @@ class RoomController extends Controller
             ->select('rooms.*', 'products.*')
             ->where('rooms.room_slug', $slug)
             ->first();
-
         return response()->json(['data' => $data]);
     }
 }

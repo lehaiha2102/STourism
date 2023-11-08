@@ -9,6 +9,17 @@ function IndexPage() {
   const [provinceList, setProvinceList] = useState([]);
   const [search, setSearch] = useState(null);
 
+  function getDefaultCheckInTime() {
+    const now = new Date();
+    now.setHours(now.getHours() + 8);
+    return now.toISOString().slice(0, 16);
+  }
+
+  function getDefaultCheckOutTime() {
+    const now = new Date();
+    now.setHours(now.getHours() + 20);
+    return now.toISOString().slice(0, 16);
+  }
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -52,26 +63,6 @@ function IndexPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/v2/products/food`);
-        if (res.ok) {
-          const { data } = await res.json();
-          setFoodProductList(data.data);
-        } else {
-          console.error('Error fetching data:', res.statusText);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error.message);
-      }
-    };
-
-    if (foodProductList.length === 0) {
-      fetchData();
-    }
-  }, [foodProductList]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
         const res = await fetch(`http://127.0.0.1:8000/api/v2/provice`);
         if (res.ok) {
           const { data } = await res.json();
@@ -83,7 +74,7 @@ function IndexPage() {
         console.error('Error fetching data:', error.message);
       }
     };
-    if (provinceList.length === 0) {
+    if (!Array.isArray(provinceList) || provinceList.length === 0) {
       fetchData();
     }
   }, [provinceList]);
@@ -91,11 +82,17 @@ function IndexPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const selectedProvince = event.target.elements.province.value;
-    const selectedCategory = event.target.elements.category.value;
-    if (!selectedProvince || !selectedCategory) {
+    const checkIn = event.target.elements.checkIn.value;
+    const checkOut = event.target.elements.checkOut.value;
+    const adult = event.target.elements.peopleQuantity.value;
+    const child = event.target.elements.childQuantity.value;
+    const roomQuantity = event.target.elements.roomQuantity.value;
+
+    if (!selectedProvince || !checkIn || !checkOut || !adult || !roomQuantity) {
       console.error('Please fill in all required fields');
       return;
     }
+
     try {
       const res = await fetch('http://127.0.0.1:8000/api/v2/rooms/search', {
         method: 'POST',
@@ -104,13 +101,18 @@ function IndexPage() {
         },
         body: JSON.stringify({
           province: selectedProvince,
-          category: selectedCategory,
-          }),
+          checkIn: checkIn,
+          checkOut: checkOut,
+          adult: adult,
+          child: child,
+          roomQuantity: roomQuantity,
+        }),
       });
 
       if (res.ok) {
         const dataSearch = await res.json();
-        setSearch(dataSearch.data.data)
+        console.log(dataSearch)
+        setSearch(dataSearch.data);
       } else {
         console.error('Error fetching data:', res.statusText);
       }
@@ -119,7 +121,7 @@ function IndexPage() {
     }
   };
 
-  console.log(search)
+
   // @ts-ignore
   return (
     <Layout title="Home | Next.js + TypeScript">
@@ -166,38 +168,61 @@ function IndexPage() {
           <div className="container">
             <div className="bg-white shadow" style={{ padding: '35px' }}>
               <form onSubmit={handleSubmit}>
-                <div className="row g-2">
-                  <div className="col-md-10">
-                    <div className="row g-2">
-                      <div className="col-md-5">
-                        <select className="form-select" defaultValue="" name="province">
-                          <option selected>Khu vực</option>
-                          {provinceList ? (
-                            provinceList.map((province) => (
+                <div className="row">
+                  <div className="col-md-12">
+                    <label htmlFor="provice-choose"><strong>Thành phố, địa điểm</strong></label>
+                    <select id="provice-choose" className="form-select" defaultValue="" name="province">
+                      <option value="3" selected>Đà Nẵng</option>
+                      {provinceList ? (
+                        provinceList.map((province) => {
+                          if (province.id !== 3) {
+                            return (
                               <option key={province.id} value={province.id}>
                                 {province.name}
                               </option>
-                            ))
-                          ) : (
-                            <p>Loading...</p>
-                          )}
-                        </select>
-                      </div>
-                      <div className="col-md-5">
-                        <select className="form-select" defaultValue="" name="category">
-                          <option selected>Dịch vụ</option>
-                          {categoryList.map((category, index) => (
-                            <option key={index} value={category.id}>
-                              {category.category_name}
-                            </option>
-                          ))}
-
-                        </select>
-                      </div>
-                    </div>
+                            );
+                          }
+                          return null;
+                        })
+                      ) : (
+                        <p>Loading...</p>
+                      )}
+                    </select>
                   </div>
-                  <div className="col-md-2">
-                    <button className="btn btn-primary w-100">Tìm</button>
+                  <div className="col-md-6 mt-4">
+                    <label htmlFor="check-in-choose"><strong>Thời gian nhận phòng(Bàn)</strong></label>
+                    <input
+                      type="datetime-local"
+                      id="check-in-choose"
+                      className="form-control"
+                      name="checkIn"
+                      defaultValue={getDefaultCheckInTime()}
+                    />
+                  </div>
+                  <div className="col-md-6 mt-4">
+                    <label htmlFor="check-out-choose"><strong>Thời gian trả phòng(Bàn)</strong></label>
+                    <input
+                      type="datetime-local"
+                      id="check-out-choose"
+                      className="form-control"
+                      name="checkOut"
+                      defaultValue={getDefaultCheckOutTime()}
+                    />
+                  </div>
+                  <div className="col-md-4 mt-4">
+                    <label htmlFor="quantity-people-choose"><strong>Số lượng người</strong></label>
+                    <input id="quantity-people-choose" type="number" min={1} className="form-select" defaultValue={1} name="peopleQuantity" />
+                  </div>
+                  <div className="col-md-4 mt-4">
+                    <label htmlFor="quantity-people-choose"><strong>Số lượng trẻ em</strong></label>
+                    <input id="quantity-people-choose" type="number" min={0} className="form-select" defaultValue={1} name="childQuantity" />
+                  </div>
+                  <div className="col-md-4 mt-4">
+                    <label htmlFor="quantity-room-choose"><strong>Số lượng phòng</strong></label>
+                    <input id="quantity-room-choose" type="number" min={1} className="form-select" defaultValue={1} name="roomQuantity" />
+                  </div>
+                  <div className="col-md-12 mt-3 d-flex justify-content-center align-items-center">
+                    <button className="btn btn-primary px-5">Tìm</button>
                   </div>
                 </div>
               </form>
@@ -205,64 +230,64 @@ function IndexPage() {
           </div>
         </div>
         {Array.isArray(search) ? (
-            <div className="container-xxl py-5">
-              <div className="container">
-                <div className="text-center wow fadeInUp" data-wow-delay="0.1s">
-                  <h1 className="mb-5">Thông tin khớp với kết quả tìm kiếm của bạn</h1>
-                </div>
-                <div className="row g-4">
-                  {search.map((room, index) => (
-                      <div
-                          className={`col-lg-4 col-md-6 wow fadeInUp`}
-                          data-wow-delay={`${0.1 * (index + 1)}s`}
-                          key={index}
-                      >
-                        <div className="room-item shadow rounded overflow-hidden">
+          <div className="container-xxl py-5">
+            <div className="container">
+              <div className="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h1 className="mb-5">Thông tin khớp với kết quả tìm kiếm của bạn</h1>
+              </div>
+              <div className="row g-4">
+                {search.map((room, index) => (
+                  <div
+                    className={`col-lg-4 col-md-6 wow fadeInUp`}
+                    data-wow-delay={`${0.1 * (index + 1)}s`}
+                    key={index}
+                  >
+                    <div className="room-item shadow rounded overflow-hidden">
+                      <div className="position-relative">
+                        {room.room_image && room.room_image.length > 0 && (
                           <div className="position-relative">
-                            {room.room_image && room.room_image.length > 0 && (
-                                <div className="position-relative">
-                                  <img
-                                      className="img-fluid"
-                                      src={`http://127.0.0.1:8000/images/${JSON.parse(room.room_image)[0]}`}
-                                      alt=''
-                                      style={{
-                                        height: '200px',
-                                        width: '100%'
-                                      }}
-                                  />
-                                </div>
-                            )}
+                            <img
+                              className="img-fluid"
+                              src={`http://127.0.0.1:8000/images/${JSON.parse(room.room_image)[0]}`}
+                              alt=''
+                              style={{
+                                height: '200px',
+                                width: '100%'
+                              }}
+                            />
                           </div>
-                          <div className="p-4 mt-2">
-                            <div className="d-flex flex-column justify-content-center align-items-center mb-3">
-                              <h5 className="mb-0">{room.room_name}</h5>
-                              <div className="d-flex justify-content-center my-3">
-                                <small className="fa fa-star text-primary"></small>
-                                <small className="fa fa-star text-primary"></small>
-                                <small className="fa fa-star text-primary"></small>
-                                <small className="fa fa-star text-primary"></small>
-                                <small className="fa fa-star text-primary"></small>
-                              </div>
-                            </div>
-                            <p className="text-body mb-3"><i className="fa fa-map-marker-alt me-3"></i>{room.product_name}, {room.product_address}</p>
-                            <p className="text-body mb-3"><i className="fa fa-phone-alt me-3"></i> {room.product_phone}</p>
-                            <div className="d-flex justify-content-center">
-                              <Link className="btn btn-sm btn-primary rounded py-2 px-4" href={`/phong/${room.room_slug || ''}`}>
-                                Xem chi tiết
-                              </Link>
-                            </div>
+                        )}
+                      </div>
+                      <div className="p-4 mt-2">
+                        <div className="d-flex flex-column justify-content-center align-items-center mb-3">
+                          <h5 className="mb-0">{room.room_name}</h5>
+                          <div className="d-flex justify-content-center my-3">
+                            <small className="fa fa-star text-primary"></small>
+                            <small className="fa fa-star text-primary"></small>
+                            <small className="fa fa-star text-primary"></small>
+                            <small className="fa fa-star text-primary"></small>
+                            <small className="fa fa-star text-primary"></small>
                           </div>
                         </div>
+                        <p className="text-body mb-3"><i className="fa fa-map-marker-alt me-3"></i>{room.product_name}, {room.product_address}</p>
+                        <p className="text-body mb-3"><i className="fa fa-phone-alt me-3"></i> {room.product_phone}</p>
+                        <div className="d-flex justify-content-center">
+                          <Link className="btn btn-sm btn-primary rounded py-2 px-4" href={`/phong/${room.room_slug || ''}`}>
+                            Xem chi tiết
+                          </Link>
+                        </div>
                       </div>
-                  ))}
-                </div>
-                <div className="text-center wow fadeInUp mt-5" data-wow-delay="0.1s">
-                  <a className="btn btn-primary py-3 px-5 mt-2" href="">Xem thêm</a>
-                </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="text-center wow fadeInUp mt-5" data-wow-delay="0.1s">
+                <a className="btn btn-primary py-3 px-5 mt-2" href="">Xem thêm</a>
               </div>
             </div>
+          </div>
         ) : (
-            ''
+          'Không tìm thấy kết quả phù hợp'
         )}
         <div className="container-xxl py-5">
           <div className="container">

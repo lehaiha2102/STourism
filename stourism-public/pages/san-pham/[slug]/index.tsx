@@ -3,6 +3,17 @@ import { useEffect, useState } from 'react';
 import Layout from '../../../components/Layout';
 import Link from 'next/link';
 
+function PriceFormatter({ price }) {
+    const formattedPrice = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(price);
+
+    return <span>{formattedPrice}</span>;
+}
+
 const Product = () => {
     const router = useRouter();
     const { slug } = router.query;
@@ -116,24 +127,34 @@ const Product = () => {
             </div>
             <div className="container-xxl py-5">
                 <div className="container">
-                <div className="text-center wow fadeInUp" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
-                        <h6 className="section-title text-center text-primary text-uppercase">Danh sách phòng</h6>
+                <div className="text-center wow fadeInUp mb-5" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
+                        <h6 className="section-title text-center text-primary text-uppercase">Danh sách phòng còn trống của {product ? product?.product_name : <p>Loading...</p>}</h6>
                     </div>
                     <div className="row g-4">
                     {room && room.map ((item, index) => (
-                        <div className="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
-                            <div className="rounded shadow overflow-hidden">
-                                <div className="position-relative">
-                                    <img className="img-fluid" src="img/team-1.jpg" alt=""/>
-                                        <div className="position-absolute start-50 top-100 translate-middle d-flex align-items-center">
-                                            <a className="btn btn-square btn-primary mx-1" href=""><i className="fab fa-facebook-f"></i></a>
-                                            <a className="btn btn-square btn-primary mx-1" href=""><i className="fab fa-twitter"></i></a>
-                                            <a className="btn btn-square btn-primary mx-1" href=""><i className="fab fa-instagram"></i></a>
-                                        </div>
+                        <div className="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
+                            <div className="rounded shadow overflow-hidden row py-5">
+                               <div className="col-lg-3">
+                                   <img src="" className="w-100"/>
+                               </div>
+                                <div className="col-lg-6 flex-column">
+                                    <h3 className="px-5">{item.room_name}</h3>
+                                    <hr/>
+                                    <div className="d-flex justify-content-between px-3">
+                                        <span>1 giường đơn</span>
+                                        <span>Tối đa 1 người lớn, hai trẻ em</span>
+                                    </div>
+                                    <div className="d-flex justify-content-between px-3 row">
+                                        <span className="col-lg-6">1 giường đơn</span>
+                                        <span className="col-lg-6">1 giường đơn</span>
+                                        <span className="col-lg-6">1 giường đơn</span>
+                                        <span className="col-lg-6">1 giường đơn</span>
+                                        <span className="col-lg-6">1 giường đơn</span>
+                                    </div>
                                 </div>
-                                <div className="text-center p-4 mt-3">
-                                    <h5 className="fw-bold mb-0">{item.room_name}</h5>
-                                    <small>Designation</small>
+                                <div className="col-md-3 flex-column justify-content-center align-items-center">
+                                    <span className="w-100 text-center mb-5">Giá phòng:<PriceFormatter price={item.room_rental_price} /></span>
+                                    <Link className="btn btn-primary w-100 py-3" href={`/dat-phong/${item.room_slug || ''}`}>Đặt phòng ngay</Link>
                                 </div>
                             </div>
                         </div>
@@ -141,85 +162,85 @@ const Product = () => {
                     </div>
                 </div>
             </div>
-            <div className="container-xxl mb-5">
-                <div className="container">
-                    <div className="text-center wow fadeInUp mb-5" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
-                        <h6 className="section-title text-center text-primary text-uppercase">Đặt phòng ngay</h6>
-                    </div>
-                    <div className="row g-5">
-                        <div className="col-lg-6">
-                            <img
-                                className="img-fluid rounded w-100 wow zoomIn"
-                                data-wow-delay="0.1s"
-                                src={`http://127.0.0.1:8000/images/${product?.product_main_image}`}
-                                style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'zoomIn' }}
-                            />
-                        </div>
-                        <div className="col-lg-6 d-flex justify-content-center align-content-center">
-                            <div className="wow fadeInUp" data-wow-delay="0.2s" style={{ visibility: 'visible', animationDelay: '0.2s', animationName: 'fadeInUp' }}>
-                                <form>
-                                    <div className="row g-3">
-                                        <div className="col-md-12">
-                                            <div className="form-floating">
-                                                <input type="text" className="form-control" id="name" placeholder="Tên của bạn" />
-                                                <label htmlFor="name">Tên của bạn</label>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-12">
-                                            <div className="form-floating">
-                                                <input type="email" className="form-control" id="email" placeholder="Email của bạn" />
-                                                <label htmlFor="email">Email của bạn</label>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-12">
-                                            <div className="form-floating">
-                                                <input type="phone" className="form-control" id="phone" placeholder="Số điện thoại của bạn" />
-                                                <label htmlFor="phone">Số điện thoại của bạn</label>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-12">
-                                            <div className="form-floating date" id="date3" data-target-input="nearest">
-                                                <input type="datetime-local" className="form-control datetimepicker-input" id="checkin" placeholder="Thời gian nhận phòng" />
-                                                <label htmlFor="checkin">Thời gian nhận phòng</label>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-12">
-                                            <div className="form-floating date" id="date4" data-target-input="nearest">
-                                                <input type="datetime-local" className="form-control datetimepicker-input" id="checkout" placeholder="Thời gian trả phòng" />
-                                                <label htmlFor="checkout">Thời gian trả phòng</label>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-12">
-                                            <div className="form-floating">
-                                                <select className="form-select" id="select1">
-                                                    <option value="1">1 người</option>
-                                                    <option value="2">2 người</option>
-                                                    <option value="3">5 người</option>
-                                                    <option value="4">Trên 5 người</option>
-                                                </select>
-                                                <label htmlFor="select1">Số lượng người</label>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-12">
-                                            <div className="form-floating">
-                                                <select className="form-select" id="select2">
-                                                    <option value="1">Child 1</option>
-                                                    <option value="2">Child 2</option>
-                                                    <option value="3">Child 3</option>
-                                                </select>
-                                                <label htmlFor="select2">Chọn phòng</label>
-                                            </div>
-                                        </div>
-                                        <div className="col-12">
-                                            <button className="btn btn-primary w-100 py-3" type="submit">Book Now</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {/*<div className="container-xxl mb-5">*/}
+            {/*    <div className="container">*/}
+            {/*        <div className="text-center wow fadeInUp mb-5" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>*/}
+            {/*            <h6 className="section-title text-center text-primary text-uppercase">Đặt phòng ngay</h6>*/}
+            {/*        </div>*/}
+            {/*        <div className="row g-5">*/}
+            {/*            <div className="col-lg-6">*/}
+            {/*                <img*/}
+            {/*                    className="img-fluid rounded w-100 wow zoomIn"*/}
+            {/*                    data-wow-delay="0.1s"*/}
+            {/*                    src={`http://127.0.0.1:8000/images/${product?.product_main_image}`}*/}
+            {/*                    style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'zoomIn' }}*/}
+            {/*                />*/}
+            {/*            </div>*/}
+            {/*            <div className="col-lg-6 d-flex justify-content-center align-content-center">*/}
+            {/*                <div className="wow fadeInUp" data-wow-delay="0.2s" style={{ visibility: 'visible', animationDelay: '0.2s', animationName: 'fadeInUp' }}>*/}
+            {/*                    <form>*/}
+            {/*                        <div className="row g-3">*/}
+            {/*                            <div className="col-md-12">*/}
+            {/*                                <div className="form-floating">*/}
+            {/*                                    <input type="text" className="form-control" id="name" placeholder="Tên của bạn" />*/}
+            {/*                                    <label htmlFor="name">Tên của bạn</label>*/}
+            {/*                                </div>*/}
+            {/*                            </div>*/}
+            {/*                            <div className="col-md-12">*/}
+            {/*                                <div className="form-floating">*/}
+            {/*                                    <input type="email" className="form-control" id="email" placeholder="Email của bạn" />*/}
+            {/*                                    <label htmlFor="email">Email của bạn</label>*/}
+            {/*                                </div>*/}
+            {/*                            </div>*/}
+            {/*                            <div className="col-md-12">*/}
+            {/*                                <div className="form-floating">*/}
+            {/*                                    <input type="phone" className="form-control" id="phone" placeholder="Số điện thoại của bạn" />*/}
+            {/*                                    <label htmlFor="phone">Số điện thoại của bạn</label>*/}
+            {/*                                </div>*/}
+            {/*                            </div>*/}
+            {/*                            <div className="col-md-12">*/}
+            {/*                                <div className="form-floating date" id="date3" data-target-input="nearest">*/}
+            {/*                                    <input type="datetime-local" className="form-control datetimepicker-input" id="checkin" placeholder="Thời gian nhận phòng" />*/}
+            {/*                                    <label htmlFor="checkin">Thời gian nhận phòng</label>*/}
+            {/*                                </div>*/}
+            {/*                            </div>*/}
+            {/*                            <div className="col-md-12">*/}
+            {/*                                <div className="form-floating date" id="date4" data-target-input="nearest">*/}
+            {/*                                    <input type="datetime-local" className="form-control datetimepicker-input" id="checkout" placeholder="Thời gian trả phòng" />*/}
+            {/*                                    <label htmlFor="checkout">Thời gian trả phòng</label>*/}
+            {/*                                </div>*/}
+            {/*                            </div>*/}
+            {/*                            <div className="col-md-12">*/}
+            {/*                                <div className="form-floating">*/}
+            {/*                                    <select className="form-select" id="select1">*/}
+            {/*                                        <option value="1">1 người</option>*/}
+            {/*                                        <option value="2">2 người</option>*/}
+            {/*                                        <option value="3">5 người</option>*/}
+            {/*                                        <option value="4">Trên 5 người</option>*/}
+            {/*                                    </select>*/}
+            {/*                                    <label htmlFor="select1">Số lượng người</label>*/}
+            {/*                                </div>*/}
+            {/*                            </div>*/}
+            {/*                            <div className="col-md-12">*/}
+            {/*                                <div className="form-floating">*/}
+            {/*                                    <select className="form-select" id="select2">*/}
+            {/*                                        <option value="1">Child 1</option>*/}
+            {/*                                        <option value="2">Child 2</option>*/}
+            {/*                                        <option value="3">Child 3</option>*/}
+            {/*                                    </select>*/}
+            {/*                                    <label htmlFor="select2">Chọn phòng</label>*/}
+            {/*                                </div>*/}
+            {/*                            </div>*/}
+            {/*                            <div className="col-12">*/}
+            {/*                                <button className="btn btn-primary w-100 py-3" type="submit">Book Now</button>*/}
+            {/*                            </div>*/}
+            {/*                        </div>*/}
+            {/*                    </form>*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*</div>*/}
         </Layout>
     );
 };

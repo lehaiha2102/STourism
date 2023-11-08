@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RoomController;
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -20,6 +21,12 @@ use App\Http\Controllers\Api\LocationController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('/v2/login', [AuthController::class, 'login'])->name('login');
+Route::post('/v2/register', [AuthController::class, 'register'])->name('registerPost');
+Route::post('/v2/confirm-email', [AuthController::class, 'confirmEmail'])->name('confirmEmail');
+Route::post('/v2/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgotPassword');
+Route::post('/v2/reset-password', [AuthController::class, 'resetPassword'])->name('resetPassword');
 
 Route::get('/v2/{slug}/categories', [CategoryController::class, 'getCategory']);
 Route::get('/v2/categories', [CategoryController::class, 'getCategoryList']);

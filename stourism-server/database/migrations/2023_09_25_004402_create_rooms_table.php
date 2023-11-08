@@ -17,12 +17,11 @@ class CreateRoomsTable extends Migration
             $table->id();
             $table->string('room_name');
             $table->string('room_slug');
-            $table->string('room_type');
             $table->unsignedBigInteger('product_id');
             $table->json('room_image');
-            $table->double('room_area');
             $table->integer('room_quantity')->default(1);
-            $table->integer('room_capacity')->default(1);
+            $table->integer('adult_capacity')->default(1);
+            $table->integer('children_capacity')->default(0);
             $table->double('room_rental_price');
             $table->text('room_description');
             $table->foreign('product_id')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');

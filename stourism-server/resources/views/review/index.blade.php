@@ -5,7 +5,7 @@
             <div class="card w-100">
                 <div class="card-body p-4">
                     <div class="table-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title fw-semibold mb-4">Danh mục</h5>
+                        <h5 class="card-title fw-semibold mb-4">Đánh giá</h5>
                         <a href="{{ route('product.new')  }}" class="btn btn-outline-success m-1 mb-4">Thêm mới</a>
                     </div>
                     <div class="table-responsive">

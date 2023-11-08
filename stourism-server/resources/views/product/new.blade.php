@@ -118,8 +118,8 @@
                     type: 'POST',
                     url: '/admin/san-pham/them-moi',
                     data: formData,
-                    processData: false,  // Không xử lý dữ liệu
-                    contentType: false,  // Không đặt kiểu dữ liệu
+                    processData: false,
+                    contentType: false,
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                         'Accept': 'application/json'

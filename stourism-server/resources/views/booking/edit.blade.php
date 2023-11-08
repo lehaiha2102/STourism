@@ -9,13 +9,13 @@
                         @foreach($booking as $b)
                         <form id="booking-form">
                             <div class="mb-3">
+                                <input type="hidden" id="booking-id" value="{{ $b->id }}">
                                 <label for="disabledSelect1" class="form-label">Người thuê</label>
-                                <select id="disabledSelect1" name="booker" value="{{ $b->booker }}" class="form-select">
-                                    <option ></option>
-                                    @foreach($users as $index => $user)
-                                        <option value="{{ $user->id }}">{{ $user->full_name }}</option>
+                                <select id="disabledSelect1" name="booker" class="form-select">
+                                    @foreach ($users as $index => $user)
+                                        <option value="{{ $user->id }}" {{ $b->booker == $user->id ? 'selected' : '' }}>{{ $user->full_name }}</option>
                                     @endforeach
-                                </select>
+                                </select>                                
                             </div>
                             <div class="mb-3">
                                 <label for="disabledSelect12" class="form-label">Phòng</label>
@@ -26,12 +26,21 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="disabledSelect" class="form-label">Tình trạng</label>
-                                <select id="disabledSelect" name="booking_status" value="{{ $b->booking_status }}" class="form-select">
-                                    <option value="1">Hoạt động</option>
-                                    <option value="0">Tạm ngừng</option>
+                                <label for="disabledSelect" class="form-label">Tình trạng đặt phòng</label>
+                                <select id="disabledSelect" name="booking_status" value="{{ $b->booking_status}}" class="form-select">
+                                    <option value="confirmed" {{ $b->booking_status == 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
+                                    <option value="unconfirmed" {{ $b->booking_status == 'unconfirmed' ? 'selected' : '' }}>Chưa xác nhận</option>
+                                    <option value="cancelled" {{ $b->booking_status == 'cancelled' ? 'selected' : '' }}>Hủy</option>
+                                    <option value="completed" {{ $b->booking_status == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
+                                    <option value="unpaid" {{ $b->booking_status == 'unpaid' ? 'selected' : '' }}>Chưa thanh toán</option>
+                                    <option value="paid" {{ $b->booking_status == 'paid' ? 'selected' : '' }}>Đã thanh toán</option>
+                                    <option value="in_use" {{ $b->booking_status == 'in_use' ? 'selected' : '' }}>Sử dụng</option>
+                                    <option value="overdue" {{ $b->booking_status == 'overdue' ? 'selected' : '' }}>Quá hạn</option>
+                                    <option value="pending_confirmation" {{ $b->booking_status == 'pending_confirmation' ? 'selected' : '' }}>Chờ xác nhận</option>
+                                    <option value="rejected" {{ $b->booking_status == 'rejected' ? 'selected' : '' }}>Từ chối</option>
                                 </select>
                             </div>
+                            
                             <div class="mb-3">
                                 <label for="exampleInputEmail12" class="form-label">Thời gian đến</label>
                                 <input type="datetime-local" name="checkin_time" value="{{ $b->checkin_time }}" class="form-control" id="exampleInputEmail12">
@@ -64,21 +73,22 @@
         $(document).ready(function () {
             $('#booking-form').on('submit', function (e) {
                 e.preventDefault();
+                const bookingId = $('#booking-id').val();
                 var formData = new FormData(this);
                 console.log(formData);
                 $.ajax({
                     type: 'POST',
-                    url: '/admin/thue-phong/them-moi',
+                    url: '/admin/dat-cho/'+ bookingId +'/cap-nhat',
                     data: formData,
-                    processData: false,  // Không xử lý dữ liệu
-                    contentType: false,  // Không đặt kiểu dữ liệu
+                    processData: false,
+                    contentType: false,
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                         'Accept': 'application/json'
                     },
                     success: function (response) {
                         if (response.status === 'success') {
-                            window.location.href = '/admin/thue-phong';
+                            window.location.href = '/admin/dat-cho';
                         } else {
                             alert('Có lỗi trong quá trình thêm mới doanh nghiệp. Vui lòng thử lại.');
                         }

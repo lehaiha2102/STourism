@@ -26,6 +26,7 @@ class CreateProductsTable extends Migration
             $table->text('product_description');
             $table->boolean('product_status')->default(true);
             $table->json('product_service');
+            $table->unsignedBigInteger('ward_id')->default(1);
             $table->timestamps();
         });
     }

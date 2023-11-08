@@ -28,7 +28,7 @@ class CategoryController extends Controller
         $bannerName = null;
         if ($request->hasFile('category_image') && $request->file('category_image')->isValid()) {
             $image = $request->file('category_image');
-            $imageName = 'logo-category-'.$category_slug . '.' . $image->getClientOriginalExtension();
+            $imageName = 'image-'.time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images'), $imageName);
         } else {
             $imageName = null;
@@ -36,7 +36,7 @@ class CategoryController extends Controller
 
         if ($request->hasFile('category_banner') && $request->file('category_banner')->isValid()) {
             $image = $request->file('category_banner');
-            $bannerName = 'banner-category-'.$category_slug . '.' . $image->getClientOriginalExtension();
+            $bannerName = 'banner-'.time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images'), $bannerName);
         } else {
             $bannerName = null;
@@ -63,7 +63,7 @@ class CategoryController extends Controller
 
         if ($request->hasFile('category_image') && $request->file('category_image')->isValid()) {
             $image = $request->file('category_image');
-            $imageName = 'logo-category-'.$category_slug_new . '.' . $image->getClientOriginalExtension();
+            $imageName = 'image-'.time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images'), $imageName);
         } else {
             $imageName = $category->category_image;
@@ -71,13 +71,12 @@ class CategoryController extends Controller
 
         if ($request->hasFile('category_banner') && $request->file('category_banner')->isValid()) {
             $image = $request->file('category_banner');
-            $bannerName = 'banner-category-'.$category_slug_new . '.' . $image->getClientOriginalExtension();
+            $bannerName = 'banner-'.time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images'), $bannerName);
         } else {
             $bannerName = $category->category_banner;
         }
 
-        // Lưu tên danh mục mới
         $new_category_name = $request->input('category_name');
 
         $data = [

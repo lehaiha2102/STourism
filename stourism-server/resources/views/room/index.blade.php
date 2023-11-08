@@ -5,7 +5,7 @@
             <div class="card w-100">
                 <div class="card-body p-4">
                     <div class="table-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title fw-semibold mb-4">Quản lý phòng & bàn</h5>
+                        <h5 class="card-title fw-semibold mb-4">Quản lý phòng</h5>
                         <a href="{{ route('room.new')  }}" class="btn btn-outline-success m-1 mb-4">Thêm mới</a>
                     </div>
                     <div class="table-responsive">
@@ -25,13 +25,7 @@
                                     <h6 class="fw-semibold mb-0">Số lượng</h6>
                                 </th>
                                 <th class="border-bottom-0">
-                                    <h6 class="fw-semibold mb-0">Diện tích</h6>
-                                </th>
-                                <th class="border-bottom-0">
                                     <h6 class="fw-semibold mb-0">Giá thuê</h6>
-                                </th>
-                                <th class="border-bottom-0">
-                                    <h6 class="fw-semibold mb-0 d-flex align-items-center justify-content-center">Diện tích</h6>
                                 </th>
                                 <th class="border-bottom-0">
                                     {{-- some thing --}}
@@ -53,16 +47,10 @@
                                             @endforeach
                                     </td>
                                     <td class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-1">{{ $room->room_quantity }} phòng(bàn)</h6>
-                                    </td>
-                                    <td class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-1">{{ $room->room_area }} m²</h6>
+                                        <h6 class="fw-semibold mb-1">{{ $room->room_quantity }} phòng</h6>
                                     </td>
                                     <td class="border-bottom-0">
                                         <h6 class="fw-semibold mb-1">{{ number_format($room->room_rental_price) }} ₫</h6>
-                                    </td>
-                                    <td class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-1">{{ $room->room_area }} m²</h6>
                                     </td>
                                     <td class="border-bottom-0">
                                         <a class="btn btn-outline-warning m-1" href="{{ route('room.edit', ['room_slug' => $room->room_slug])  }}">Chỉnh sửa</a>
