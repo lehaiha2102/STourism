@@ -1,41 +1,32 @@
-import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { SyntheticEvent, useState } from 'react';
 import SignLayout from '../../components/SignLayout';
+import { StorageKeys } from '../../utils/constant';
 
 const Signin = () => {
-    const LoginSubmit = async (event) => {
-        event.preventDefault();
-        const email = event.target.elements.province.value;
-        const password = event.target.elements.password.value;
-    
-        if (!email || !password) {
-          console.error('Please fill in all required fields');
-          return;
-        }
-    
-        try {
-          const res = await fetch('http://127.0.0.1:8000/api/v2/dang-nhap', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const router = useRouter();
+    const LoginSubmit = async (e: SyntheticEvent) => {
+        e.preventDefault();
+        await fetch("http://localhost:8000/api/v2/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                email: email,
-                password: password,
+                email,
+                password,
             }),
-          });
-    
-          if (res.ok) {
-            const dataSearch = await res.json();
-            console.log(dataSearch)
-          } else {
-            console.error('Error fetching data:', res.statusText);
-          }
-        } catch (error) {
-          console.error('Error fetching data:', error.message);
-        }
-      };
+        })
+            .then((res) => res.json())
+            .then(async (data) => {
+                console.log(data);
+                
+                localStorage.setItem(StorageKeys.jwt, data.access_token);
+                localStorage.setItem(StorageKeys.USER, JSON.stringify(data.user));
+                // await router.push("/");
+            });
+    };
 
     return (
         <SignLayout>
@@ -51,13 +42,29 @@ const Signin = () => {
                                     <div className="row g-3">
                                         <div className="col-md-12">
                                             <div className="form-floating">
-                                                <input type="email" name='email' className="form-control" id="email" placeholder="Email của bạn" />
+                                                <input
+                                                    type="email"
+                                                    name='email'
+                                                    className="form-control"
+                                                    id="email"
+                                                    placeholder="Email của bạn"
+                                                    required
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                />
                                                 <label htmlFor="email">Email của bạn</label>
                                             </div>
                                         </div>
                                         <div className="col-md-12">
                                             <div className="form-floating">
-                                                <input type="password" name='password' className="form-control" id="password" placeholder="Mật khẩu của bạn" />
+                                                <input
+                                                    type="password"
+                                                    name='password'
+                                                    className="form-control"
+                                                    id="password"
+                                                    placeholder="Mật khẩu của bạn"
+                                                    required
+                                                    onChange={(e) => setPassword(e.target.value)}
+                                                />
                                                 <label htmlFor="password">Mật khẩu của bạn</label>
                                             </div>
                                         </div>

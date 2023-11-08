@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendEmail;
 use App\Mail\Verify;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -94,7 +95,7 @@ class AuthController extends Controller
             $email = $request->email;
             $password = $request->password;
 
-            $user = DB::table('users')->where('email', $email)->first();
+            $user = User::where('email', $email)->first();
 
             if (!$user) {
                 return response()->json([
@@ -107,11 +108,13 @@ class AuthController extends Controller
 
             if ($permission && ($permission->role_id == 1 || $permission->role_id == 2)) {
                 if (Hash::check($password, $user->password)) {
+                    $token = $user->createToken('access_token')->plainTextToken;
                     session(['user' => $user, 'permission' => $permission]);
                     return response()->json([
                         'status' => 'success',
                         'messenger' => 'Login successfully',
-                        'data' => $user,
+                        'user' => $user,
+                        'access_token' => $token
                     ]);
                 } else {
                     return response()->json([
