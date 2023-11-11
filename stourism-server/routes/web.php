@@ -72,4 +72,5 @@ Route::group(['middleware' => ['CheckLoginServer']], function () {
     Route::post('/admin/dat-cho/cap-nhat-trang-thai', [BookingController::class, 'bookingStatus'])->name('booking.change-status');
     Route::post('/admin/dat-cho/huy-dat-phong', [BookingController::class, 'cancelBooking'])->name('booking.cancel_booking');
 
+    Route::get('/admin/danh-gia', [\App\Http\Controllers\RatingController::class, 'index'])->name('rating');
 });

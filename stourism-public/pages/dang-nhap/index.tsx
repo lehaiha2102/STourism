@@ -1,13 +1,24 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useState, useEffect } from 'react';
 import SignLayout from '../../components/SignLayout';
 import { StorageKeys } from '../../utils/constant';
+import { log } from 'console';
 
 const Signin = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
+    const {param} = router.query;
+
+    useEffect(() => {
+        const token = localStorage.getItem(StorageKeys.jwt);
+        const userString = localStorage.getItem(StorageKeys.USER);
+        const user = JSON.parse(userString);
+        if (token && user) {
+            router.push(`/`);
+        } 
+    }, []);
     const LoginSubmit = async (e: SyntheticEvent) => {
         e.preventDefault();
         await fetch("http://localhost:8000/api/v2/login", {
@@ -24,7 +35,7 @@ const Signin = () => {
                 
                 localStorage.setItem(StorageKeys.jwt, data.access_token);
                 localStorage.setItem(StorageKeys.USER, JSON.stringify(data.user));
-                // await router.push("/");
+                await router.push(`/`);
             });
     };
 

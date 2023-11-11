@@ -5,7 +5,7 @@
             <div class="card w-100">
                 <div class="card-body p-4">
                     <div class="table-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title fw-semibold mb-4">Danh mục</h5>
+                        <h5 class="card-title fw-semibold mb-4">Đánh giá</h5>
                         <a href="{{ route('product.new')  }}" class="btn btn-outline-success m-1 mb-4">Thêm mới</a>
                     </div>
                     <div class="table-responsive">
@@ -24,7 +24,7 @@
                                 <th class="border-bottom-0">
                                     <h6 class="fw-semibold mb-0">Chủ sở hữu</h6>
                                 </th>
-            
+
                                 <th class="border-bottom-0">
                                     <h6 class="fw-semibold mb-0 d-flex align-items-center justify-content-center">Trạng thái</h6>
                                 </th>

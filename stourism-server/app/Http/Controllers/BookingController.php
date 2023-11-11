@@ -19,18 +19,22 @@ class BookingController extends Controller
 
     public function newBookingPost(Request $request)
     {
-        DB::table('booking')->insert([
+        $booking = DB::table('booking')->insertGetId([
             'booker' => $request->booker,
+            'booker_email' => $request->email,
+            'booker_phone' => $request->phone,
+            'booking_type' => $request->booking_type,
             'room_id' => $request->room_id,
-            'booking_status' => $request->booking_status,
-            'checkin_time' => $request->checkin_time,
-            'checkout_time' => $request->checkout_time,
-            'advance_payment_check' => $request->advance_payment_check,
-            'advance_payment' => $request->advance_payment,
+            'checkin_time' => $request->checkin,
+            'checkout_time' => $request->checkout,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        return response()->json(['status' => 'success']);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $booking
+        ]);
     }
 
     public function bookingEdit($bookingId)
@@ -39,6 +43,26 @@ class BookingController extends Controller
         $users = DB::table('users')->get();
         $booking = DB::table('booking')->where('id', $bookingId)->get();
         return view('booking.edit', compact('booking', 'rooms', 'users'));
+    }
+
+    public function bookingById($bookingId)
+    {
+        $booking = DB::table('booking')->where('id', $bookingId)->first();
+       if($booking){
+           $rooms = DB::table('rooms')->where('id', '=', $booking->room_id)->first();
+           $users = DB::table('users')->where('id', '=', $booking->booker)->first();
+           return response()->json([
+              'data' => [
+                  'rooms' => $rooms,
+                  'users' => $users,
+                  'booking' => $booking
+              ]
+           ]);
+       } else{
+           return response()->json([
+               'messenger' => 'Không tìm thấy thông tin đặt phòng',
+           ], 500);
+       }
     }
 
     public function bookingUpdate(Request $request, $bookingId){

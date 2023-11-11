@@ -12,5 +12,5 @@ export interface IUser {
     address?: string | null;
   }
   
-  export const defaultValue: Readonly<IUser> = {};
+  export default IUser;
   

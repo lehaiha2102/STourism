@@ -2,6 +2,9 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Layout from '../../../components/Layout';
 import Link from 'next/link';
+import { apiURL } from '../../../utils/constant';
+import IProduct from '../../../models/product.model';
+import IRoom from '../../../models/room.model';
 
 function PriceFormatter({ price }) {
     const formattedPrice = new Intl.NumberFormat('vi-VN', {
@@ -17,8 +20,8 @@ function PriceFormatter({ price }) {
 const Product = () => {
     const router = useRouter();
     const { slug } = router.query;
-    const [product, setProduct] = useState();
-    const [room, setRoom] = useState([]);
+    const [product, setProduct] = useState<IProduct>();
+    const [room, setRoom] = useState<IRoom>();
     const [productId, setProductId] = useState('');
 
     useEffect(() => {
@@ -49,7 +52,7 @@ const Product = () => {
                 if (res.ok) {
                     const { data } = await res.json();
                     setRoom(data);
-                    console.log(data);
+                    console.log('data', data);
 
                 } else {
                     console.error('Error fetching data:', res.statusText);
@@ -127,38 +130,45 @@ const Product = () => {
             </div>
             <div className="container-xxl py-5">
                 <div className="container">
-                <div className="text-center wow fadeInUp mb-5" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
+                    <div className="text-center wow fadeInUp mb-5" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
                         <h6 className="section-title text-center text-primary text-uppercase">Danh sách phòng còn trống của {product ? product?.product_name : <p>Loading...</p>}</h6>
                     </div>
                     <div className="row g-4">
-                    {room && room.map ((item, index) => (
-                        <div className="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
-                            <div className="rounded shadow overflow-hidden row py-5">
-                               <div className="col-lg-3">
-                                   <img src="" className="w-100"/>
-                               </div>
-                                <div className="col-lg-6 flex-column">
-                                    <h3 className="px-5">{item.room_name}</h3>
-                                    <hr/>
-                                    <div className="d-flex justify-content-between px-3">
-                                        <span>1 giường đơn</span>
-                                        <span>Tối đa 1 người lớn, hai trẻ em</span>
+                        {room ? room.map((item, index) => (
+                            <div className="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
+                                <div className="rounded shadow overflow-hidden row py-5">
+                                    <div className="col-lg-3">
+                                        {item.room_image && item.room_image.length > 0 && (
+                                            <img
+                                                className="img-fluid rounded w-100 wow zoomIn"
+                                                src={`${apiURL}/images/${JSON.parse(item.room_image)[0]}`}
+                                                data-wow-delay="0.1s"
+                                                style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'zoomIn' }}
+                                            />
+                                        )}
                                     </div>
-                                    <div className="d-flex justify-content-between px-3 row">
-                                        <span className="col-lg-6">1 giường đơn</span>
-                                        <span className="col-lg-6">1 giường đơn</span>
-                                        <span className="col-lg-6">1 giường đơn</span>
-                                        <span className="col-lg-6">1 giường đơn</span>
-                                        <span className="col-lg-6">1 giường đơn</span>
+                                    <div className="col-lg-6 flex-column">
+                                        <h3 className="px-5">{item.room_name}</h3>
+                                        <hr />
+                                        <div className="d-flex justify-content-between px-3">
+                                            <span>1 giường đơn</span>
+                                            <span>Tối đa 1 người lớn, hai trẻ em</span>
+                                        </div>
+                                        <div className="d-flex justify-content-between px-3 row">
+                                            <span className="col-lg-6">1 giường đơn</span>
+                                            <span className="col-lg-6">1 giường đơn</span>
+                                            <span className="col-lg-6">1 giường đơn</span>
+                                            <span className="col-lg-6">1 giường đơn</span>
+                                            <span className="col-lg-6">1 giường đơn</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="col-md-3 flex-column justify-content-center align-items-center">
-                                    <span className="w-100 text-center mb-5">Giá phòng:<PriceFormatter price={item.room_rental_price} /></span>
-                                    <Link className="btn btn-primary w-100 py-3" href={`/dat-phong/${item.room_slug || ''}`}>Đặt phòng ngay</Link>
+                                    <div className="col-md-3 flex-column justify-content-center align-items-center">
+                                        <span className="w-100 text-center mb-5">Giá phòng:<PriceFormatter price={item.room_rental_price} /></span>
+                                        <Link className="btn btn-primary w-100 py-3" href={`/dat-phong/${item.room_slug || ''}`}>Đặt phòng ngay</Link>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        )) : <span className='d-flex w-100 justify-content-center'>Hiện tại không tìm thấy bất kỳ phòng trống nào</span>}
                     </div>
                 </div>
             </div>

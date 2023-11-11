@@ -19,11 +19,25 @@ class RoomController extends Controller
     }
 
     public function getProductRooms($id) {
+        $currentDateTime = now();
+    
         $data = DB::table('rooms')
-        ->where('product_id', $id)
-        ->get();
+            ->where('product_id', $id)
+            ->whereNotExists(function ($query) use ($currentDateTime) {
+                $query->select(DB::raw(1))
+                    ->from('booking')
+                    ->whereRaw('booking.room_id = rooms.id')
+                    ->where('checkout_time', '>', $currentDateTime);
+            })
+            ->get();
+    
+        if ($data->isEmpty()) {
+            return response()->json(['message' => 'No available rooms']);
+        }
+    
         return response()->json(['data' => $data]);
     }
+    
 
     public function getRoom($slug){
         $data = DB::table('rooms')

@@ -18,15 +18,19 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+
+Route::middleware(['auth:sanctum'])->group(function () {});
+
+Route::post('/v2/reset-password', [AuthController::class, 'resetPassword'])->name('resetPassword');
+Route::post('/v2/booking', [\App\Http\Controllers\BookingController::class, 'newBookingPost']);
+Route::get('/v2/booking/{bookingId}', [\App\Http\Controllers\BookingController::class, 'bookingById']);
+Route::post('/v2/rating', [\App\Http\Controllers\RatingController::class, 'createRating']);
 
 Route::post('/v2/login', [AuthController::class, 'login'])->name('login');
 Route::post('/v2/register', [AuthController::class, 'register'])->name('registerPost');
 Route::post('/v2/confirm-email', [AuthController::class, 'confirmEmail'])->name('confirmEmail');
 Route::post('/v2/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgotPassword');
-Route::post('/v2/reset-password', [AuthController::class, 'resetPassword'])->name('resetPassword');
+
 
 Route::get('/v2/{slug}/categories', [CategoryController::class, 'getCategory']);
 Route::get('/v2/categories', [CategoryController::class, 'getCategoryList']);
@@ -39,3 +43,4 @@ Route::get('/v2/{slug}/rooms', [RoomController::class, 'getRoom']);
 Route::get('/v2/rooms', [RoomController::class, 'getRoomList']);
 Route::get('/v2/product/{id}/rooms', [RoomController::class, 'getProductRooms']);
 Route::get('/v2/provice', [LocationController::class, 'getProvinceList']);
+

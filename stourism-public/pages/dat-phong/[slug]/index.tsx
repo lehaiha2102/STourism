@@ -1,29 +1,42 @@
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import Layout from '../../../components/Layout';
-import Link from 'next/link';
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { useDispatch } from 'react-redux';
+import { StorageKeys, apiURL } from '../../../utils/constant';
+import IRoom from "../../../models/room.model";
+
 
 const Booking = () => {
     const router = useRouter();
-    const dataOrderRef = useRef();
     const { slug } = router.query;
-    console.log(slug);
-    
     const [product, setProduct] = useState();
-    const [room, setRoom] = useState([]);
-    const [productId, setProductId] = useState('');
-    const dispatch = useDispatch();
+    const [booker, setBooker] = useState<any>();
+    const [room, setRoom] = useState<IRoom>();
+
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem(StorageKeys.jwt);
+        const userString = localStorage.getItem(StorageKeys.USER);
+        const user = JSON.parse(userString);
+        
+        setBooker(user);
+        if (token && user) {
+            setIsLoggedIn(true);
+        } else {
+            setIsLoggedIn(false);
+        }
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch(`http://127.0.0.1:8000/api/v2/${slug}/products`);
+                const res = await fetch(`http://127.0.0.1:8000/api/v2/${slug}/rooms`);
                 if (res.ok) {
                     const { data } = await res.json();
-                    setProduct(data);
-                    setProductId(data?.id);
+                    setRoom(data);
+
                 } else {
                     console.error('Error fetching data:', res.statusText);
                 }
@@ -37,40 +50,49 @@ const Booking = () => {
         }
     }, [slug]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await fetch(`http://127.0.0.1:8000/api/v2/product/${productId}/rooms`);
-                if (res.ok) {
-                    const { data } = await res.json();
-                    setRoom(data);
-                    console.log(data);
-
-                } else {
-                    console.error('Error fetching data:', res.statusText);
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error.message);
+    const bookRoom = async () => {
+        try {
+            const response = await fetch(`${apiURL}/api/v2/booking`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    booker: booker?.id,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    checkin: document.getElementById('checkin').value,
+                    checkout: document.getElementById('checkout').value,
+                    room_id: room?.id,
+                    booking_type: 'Pay upon check-in',
+                }),
+            });
+    
+            if (response.ok) {
+                const { data } = await response.json();
+                
+                router.push(`/lich-su/${data}`);
+                
+            } else {
+                console.log('Error when booking');
             }
-        };
-
-        if (productId) {
-            fetchData();
+        } catch (error) {
+            console.error('Error when booking:', error);
         }
-    }, [productId]);
+    };
 
     return (
         <Layout>
             <div className="container-xxl bg-white p-0">
-                <div className="container-fluid page-header mb-5 p-0" style={{ backgroundImage: `url('http://127.0.0.1:8000/images/${product?.product_main_image}')` }}>
+                <div className="container-fluid page-header mb-5 p-0" style={{ backgroundImage: `url('../../img/Public-Banner.png')` }}>
                     <div className="container-fluid page-header-inner py-5">
                         <div className="container text-center pb-5">
-                            <h1 className="display-3 text-white mb-3 animated slideInDown text-uppercase">{product ? product?.product_name : <p>Loading...</p>}</h1>
+                            <h1 className="display-3 text-white mb-3 animated slideInDown text-uppercase">{room ? room?.room_name : <p>Loading...</p>}</h1>
                             <nav aria-label="breadcrumb">
                                 <ol className="breadcrumb justify-content-center">
                                     <li className="breadcrumb-item"><Link href={`/`}>Trang chủ</Link></li>
                                     <li className="breadcrumb-item"><Link href={`/danh-muc`}>Đặt phòng</Link></li>
-                                    <li className="breadcrumb-item text-white active d-flex" aria-current="page">{product ? product?.product_name : <p>Loading...</p>}</li>
+                                    <li className="breadcrumb-item text-white active d-flex" aria-current="page">{room ? room?.room_name : <p>Loading...</p>}</li>
                                 </ol>
                             </nav>
                         </div>
@@ -89,19 +111,19 @@ const Booking = () => {
                                     <div className="row g-3">
                                         <div className="col-md-12">
                                             <div className="form-floating">
-                                                <input type="text" className="form-control" id="name" placeholder="Tên của bạn" />
+                                                <input type="text" disabled className="form-control" id="name" value={booker?.full_name} placeholder={booker?.full_name} />
                                                 <label htmlFor="name">Tên của bạn</label>
                                             </div>
                                         </div>
                                         <div className="col-md-12">
                                             <div className="form-floating">
-                                                <input type="email" className="form-control" id="email" placeholder="Email của bạn" />
+                                                <input type="email" className="form-control" id="email" value={booker?.email} placeholder="Email của bạn" />
                                                 <label htmlFor="email">Email của bạn</label>
                                             </div>
                                         </div>
                                         <div className="col-md-12">
                                             <div className="form-floating">
-                                                <input type="phone" className="form-control" id="phone" placeholder="Số điện thoại của bạn" />
+                                                <input type="phone" className="form-control" id="phone" value={booker?.phone} placeholder="Số điện thoại của bạn" />
                                                 <label htmlFor="phone">Số điện thoại của bạn</label>
                                             </div>
                                         </div>
@@ -117,92 +139,32 @@ const Booking = () => {
                                                 <label htmlFor="checkout">Thời gian trả phòng</label>
                                             </div>
                                         </div>
-                                        <div className="col-md-12">
-                                            <div className="form-floating">
-                                                <select className="form-select" id="select1">
-                                                    <option value="1">1 người</option>
-                                                    <option value="2">2 người</option>
-                                                    <option value="3">5 người</option>
-                                                    <option value="4">Trên 5 người</option>
-                                                </select>
-                                                <label htmlFor="select1">Số lượng người</label>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-12">
-                                            <div className="form-floating">
-                                                <select className="form-select" id="select2">
-                                                    <option value="1">Child 1</option>
-                                                    <option value="2">Child 2</option>
-                                                    <option value="3">Child 3</option>
-                                                </select>
-                                                <label htmlFor="select2">Chọn phòng</label>
-                                            </div>
-                                        </div>
-                                        <div className="col-12">
-                                            <button className="btn btn-primary w-100 py-3" type="submit">Book Now</button>
-                                        </div>
                                     </div>
                                 </form>
                             </div>
                         </div>
                         <div className="col-lg-6">
-                            <PayPalScriptProvider options={{
-                                clientId: "Ac5e4GqEHjI1z8qIbZpv60vDrH2fyG0HvvIxQV5Porhb2SrGr58E49WCwOUb5hvZtDqfD6dF0IfLkRtK",
-
-                            }}>
-                                <PayPalButtons
-                                    createOrder={(data, actions) => {
-                                        return actions.order.create({
-                                            purchase_units: [
-                                                {
-                                                    amount: {
-                                                        value: totalPriceUSD,
-                                                    },
-                                                },
-                                            ],
-                                        });
-                                    }}
-                                    onApprove={async (data, actions) => {
-                                        const details = await actions.order.capture();
-
-                                        const idPayment = details.id;
-                                        const status = details.status;
-                                        const paymentTime = details.create_time;
-                                        const dateTimeString = paymentTime
-                                            .replace("T", " ")
-                                            .replace("Z", "");
-                                        const formattedPaymentTime = new Date(dateTimeString)
-                                            .toISOString()
-                                            .slice(0, 19)
-                                            .replace("T", " ");
-
-                                        const user = JSON.parse(localStorage.getItem("user"));
-                                        const userId = user.id;
-
-                                        const dataAll = dataOrderRef.current;
-
-                                        const updatedDataAll = {
-                                            // ...dataAll,
-                                            user_id: userId,
-                                            status: status,
-                                            paymentmode: "Paid by Paypal",
-                                            idPayment: idPayment,
-                                            paymentTime: formattedPaymentTime,
-                                        };
-                                        // const response = await checkoutApi.order(updatedDataAll);
-                                        // dataAll.order_items.forEach((item) => {
-                                        //     const productId = item.id;
-                                        //     dispatch(removeFromCart(productId));
-                                        // });
-                                        router.push('/');
-                                        // enqueueSnackbar("Mua hàng thành công !!!", {
-                                        //     variant: "success",
-                                        //     autoHideDuration: 7000,
-                                        // });
-                                    }}
-                                />
-                            </PayPalScriptProvider>
+                            {isLoggedIn ? (
+                                <div>
+                                    <button className="btn btn-primary w-100 py-3 mb-3 rounded" onClick={bookRoom}>Thanh toán khi nhận phòng</button>
+                                    <PayPalScriptProvider
+                                        options={{
+                                            clientId: "Ac5e4GqEHjI1z8qIbZpv60vDrH2fyG0HvvIxQV5Porhb2SrGr58E49WCwOUb5hvZtDqfD6dF0IfLkRtK",
+                                        }}
+                                    >
+                                        <PayPalButtons />
+                                    </PayPalScriptProvider>
+                                </div>
+                            ) : (
+                                <Link
+                                    className="btn btn-primary w-100 py-3"
+                                    href={`/dang-nhap?dat-phong/${room?.room_name}`}
+                                >
+                                    Vui lòng đăng nhập để thực hiện đặt phòng
+                                </Link>
+                            )}
                         </div>
+
                     </div>
                 </div>
             </div>

@@ -23,7 +23,7 @@
                                 <select id="disabledSelect" name="business_id" class="form-select">
                                     @foreach($business as $b)
                                         <option value="{{ $b->id }}">{{ $b->business_name }}</option>
-                                        @endforeach
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="mb-3">
