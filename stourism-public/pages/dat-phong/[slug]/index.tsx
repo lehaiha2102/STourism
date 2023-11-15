@@ -3,14 +3,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import Layout from '../../../components/Layout';
-import { StorageKeys, apiURL } from '../../../utils/constant';
+import { StorageKeys, apiURL, vnpUrl } from '../../../utils/constant';
 import IRoom from "../../../models/room.model";
+import { log } from "console";
 
 
 const Booking = () => {
     const router = useRouter();
     const { slug } = router.query;
-    const [product, setProduct] = useState();
+    const [booking, setBooking] = useState(false);
     const [booker, setBooker] = useState<any>();
     const [room, setRoom] = useState<IRoom>();
 
@@ -20,7 +21,7 @@ const Booking = () => {
         const token = localStorage.getItem(StorageKeys.jwt);
         const userString = localStorage.getItem(StorageKeys.USER);
         const user = JSON.parse(userString);
-        
+
         setBooker(user);
         if (token && user) {
             setIsLoggedIn(true);
@@ -35,6 +36,7 @@ const Booking = () => {
                 const res = await fetch(`http://127.0.0.1:8000/api/v2/${slug}/rooms`);
                 if (res.ok) {
                     const { data } = await res.json();
+                    
                     setRoom(data);
 
                 } else {
@@ -65,21 +67,26 @@ const Booking = () => {
                     checkout: document.getElementById('checkout').value,
                     room_id: room?.id,
                     booking_type: 'Pay upon check-in',
+                    price: room?.room_rental_price,
                 }),
             });
     
-            if (response.ok) {
-                const { data } = await response.json();
-                
-                router.push(`/lich-su/${data}`);
-                
-            } else {
-                console.log('Error when booking');
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
+    
+            const data = await response.json();
+            const status = data.status;
+            const bookingData = data.data;
+            const vnpUrl = data.url;
+    console.log(vnpUrl);
+    
+            // Tiếp tục xử lý dữ liệu nếu cần
         } catch (error) {
             console.error('Error when booking:', error);
         }
     };
+    
 
     return (
         <Layout>
@@ -104,8 +111,8 @@ const Booking = () => {
                     <div className="text-center wow fadeInUp mb-5" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
                         <h6 className="section-title text-center text-primary text-uppercase">Hoàn thiện thông tin trước khi đăt phòng</h6>
                     </div>
-                    <div className="row g-5">
-                        <div className="col-lg-6 d-flex justify-content-center align-content-center">
+                    <div className="row g-5 d-flex justify-content-center align-content-center">
+                        <div className="col-lg-8 d-flex justify-content-center align-content-center">
                             <div className="wow fadeInUp" data-wow-delay="0.2s" style={{ visibility: 'visible', animationDelay: '0.2s', animationName: 'fadeInUp' }}>
                                 <form>
                                     <div className="row g-3">
@@ -143,17 +150,41 @@ const Booking = () => {
                                 </form>
                             </div>
                         </div>
-                        <div className="col-lg-6">
+                        <div className="col-lg-8">
                             {isLoggedIn ? (
                                 <div>
-                                    <button className="btn btn-primary w-100 py-3 mb-3 rounded" onClick={bookRoom}>Thanh toán khi nhận phòng</button>
-                                    <PayPalScriptProvider
-                                        options={{
-                                            clientId: "Ac5e4GqEHjI1z8qIbZpv60vDrH2fyG0HvvIxQV5Porhb2SrGr58E49WCwOUb5hvZtDqfD6dF0IfLkRtK",
-                                        }}
-                                    >
-                                        <PayPalButtons />
-                                    </PayPalScriptProvider>
+                                    {booking && booking == true ? '' : <button className="btn btn-primary w-100 py-3 mb-3 rounded" onClick={bookRoom}>Xác nhận</button>}
+                                    {/* {booking && booking == true ?
+                                        <PayPalScriptProvider
+                                            options={{
+                                                clientId: "Ac5e4GqEHjI1z8qIbZpv60vDrH2fyG0HvvIxQV5Porhb2SrGr58E49WCwOUb5hvZtDqfD6dF0IfLkRtK",
+                                            }}
+                                        >
+                                            <PayPalButtons
+                                                createOrder={(data, actions) => {
+                                                    // Đơn hàng PayPal sẽ được tạo khi người dùng nhấn nút thanh toán
+                                                    return actions.order.create({
+                                                        purchase_units: [
+                                                            {
+                                                                amount: {
+                                                                    value: '10.00', // Thay bằng giá trị cần thanh toán
+                                                                },
+                                                                description: 'Thanh toán đặt phòng',
+                                                            },
+                                                        ],
+                                                    });
+                                                }}
+                                                onApprove={(data, actions) => {
+                                                    // Xác nhận thanh toán thành công, có thể gửi thông tin đến server
+                                                    return actions.order.capture().then(details => {
+                                                        console.log('Payment details:', details);
+                                                        // Gọi hàm xử lý thanh toán sau khi xác nhận thành công
+                                                        handlePaymentSuccess(details);
+                                                    });
+                                                }}
+                                            />
+                                        </PayPalScriptProvider>
+                                        : ''} */}
                                 </div>
                             ) : (
                                 <Link

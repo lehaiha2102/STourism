@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\constant;
 
 class BookingController extends Controller
 {
@@ -31,9 +32,59 @@ class BookingController extends Controller
             'updated_at' => now(),
         ]);
 
+        $vnp_TxnRef = $booking;
+        $vnp_Amount = $request->input('price');
+        $vnp_Locale = 'vn';
+        $vnp_BankCode = $request->input('bankCode');
+        $vnp_IpAddr = $request->ip();
+        $vnp_TmnCode = "BFE3ZL6D";
+        $vnp_HashSecret = "XIQPVJOWWPFNLQCFYEDWVOMFIGDNSBBW";
+        $startTime = date("YmdHis");
+        $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+        $inputData = [
+            "vnp_Version" => "2.1.0",
+            "vnp_TmnCode" => $vnp_TmnCode,
+            "vnp_Amount" => $vnp_Amount * 100,
+            "vnp_Command" => "pay",
+            "vnp_CreateDate" => now()->format('YmdHis'),
+            "vnp_CurrCode" => "VND",
+            "vnp_IpAddr" => $vnp_IpAddr,
+            "vnp_Locale" => $vnp_Locale,
+            "vnp_OrderInfo" => "Thanh toan GD:" . $vnp_TxnRef,
+            "vnp_OrderType" => "other",
+            "vnp_ReturnUrl" => "http://localhost:3000/lich-su/". $booking, 
+            "vnp_TxnRef" => $vnp_TxnRef,
+            "vnp_ExpireDate" => date('YmdHis',strtotime('+720 minutes',strtotime($startTime))),
+        ];
+
+        if (!empty($vnp_BankCode)) {
+            $inputData['vnp_BankCode'] = $vnp_BankCode;
+        }
+
+        ksort($inputData);
+        $query = "";
+        $i = 0;
+        $hashdata = "";
+        foreach ($inputData as $key => $value) {
+            if ($i == 1) {
+                $hashdata .= '&' . urlencode($key) . "=" . urlencode($value);
+            } else {
+                $hashdata .= urlencode($key) . "=" . urlencode($value);
+                $i = 1;
+            }
+            $query .= urlencode($key) . "=" . urlencode($value) . '&';
+        }
+
+        $vnp_Url = $vnp_Url . "?" . $query;
+        if (isset($vnp_HashSecret)) {
+            $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
+            $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
+        }
+
         return response()->json([
             'status' => 'success',
-            'data' => $booking
+            'data' => $booking,
+            'url' => $vnp_Url,
         ]);
     }
 

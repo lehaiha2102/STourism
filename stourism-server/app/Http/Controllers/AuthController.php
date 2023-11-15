@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Session;
+use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\LoginRequest;
 
 class AuthController extends Controller
 {
@@ -25,7 +27,7 @@ class AuthController extends Controller
         return view('register');
     }
 
-    public function register(Request $request)
+    public function register(RegisterUserRequest $request)
     {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         $chars_length = strlen($chars);
@@ -82,65 +84,53 @@ class AuthController extends Controller
         return view('login');
     }
 
-    public function login(Request $request){
-        $validator = Validator::make($request->all(), [
-            'email' => 'required',
-            'password' => 'required',
-        ], [
-            'email.required' => 'Email là bắt buộc.',
-            'password.required' => 'Mật khẩu là bắt buộc.',
-        ]);
-
-        if ($validator->passes()) {
-            $email = $request->email;
-            $password = $request->password;
-
-            $user = User::where('email', $email)->first();
-
-            if (!$user) {
+    public function login(LoginRequest $request)
+    {
+        $email = $request->email;
+        $password = $request->password;
+    
+        $user = User::where('email', $email)->first();
+    
+        if (!$user) {
+            return response()->json([
+                'status' => 'fail',
+                'messenger' => 'Email not found'
+            ]);
+        }
+    
+        $permission = DB::table('permission')->where('user_id', $user->id)->first();
+    
+        if ($permission && ($permission->role_id == 1 || $permission->role_id == 2)) {
+            if (Hash::check($password, $user->password)) {
+                $token = $user->createToken('access_token')->plainTextToken;
+                session(['user' => $user, 'permission' => $permission]);
                 return response()->json([
-                    'status' => 'fail',
-                    'messenger' => 'Email not found'
+                    'status' => 'success',
+                    'messenger' => 'Login successfully',
+                    'user' =>   [
+                        'id' => $user->id,
+                        'full_name' => $user->full_name,
+                        'email' => $user->email,
+                        'phone' => $user->phone,
+                        'avatar' => $user->avatar,
+                        'banner' => $user->banner,
+                        'dob' => $user->dob,
+                        'address' => $user->address
+                    ],
+                    'access_token' => $token
                 ]);
-            }
-
-            $permission = DB::table('permission')->where('user_id', $user->id)->first();
-
-            if ($permission && ($permission->role_id == 1 || $permission->role_id == 2)) {
-                if (Hash::check($password, $user->password)) {
-                    $token = $user->createToken('access_token')->plainTextToken;
-                    session(['user' => $user, 'permission' => $permission]);
-                    return response()->json([
-                        'status' => 'success',
-                        'messenger' => 'Login successfully',
-                        'user' =>   [
-                            'id' => $user->id,
-                            'full_name' => $user->full_name,
-                            'email' => $user->email,
-                            'phone' => $user->phone,
-                            'avatar' => $user->avatar,
-                            'banner' => $user->banner,
-                            'dob' => $user->dob,
-                            'address' => $user->address
-                        ],
-                        'access_token' => $token
-                    ]);
-                } else {
-                    return response()->json([
-                        'status' => 'fail',
-                        'messenger' => 'Incorrect password'
-                    ]);
-                }
             } else {
                 return response()->json([
                     'status' => 'fail',
-                    'messenger' => 'Permission denied'
+                    'messenger' => 'Incorrect password'
                 ]);
             }
+        } else {
+            return response()->json([
+                'status' => 'fail',
+                'messenger' => 'Permission denied'
+            ]);
         }
-
-        $errors = $validator->errors()->all();
-        return response()->json(['errors' => $errors], 500);
     }
 
     public function confirmEmailView(){

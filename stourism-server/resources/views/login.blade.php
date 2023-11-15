@@ -5,9 +5,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Modernize Free</title>
-  <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
-  <link rel="stylesheet" href="../assets/css/styles.min.css" />
+  <link rel="shortcut icon" type="image/png" href="/assets/images/logos/favicon.png" />
+  <link rel="stylesheet" href="/assets/css/styles.min.css" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  @yield('head')
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 
 <body>
@@ -49,15 +52,18 @@
       </div>
     </div>
   </div>
-  <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-  <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/js/sidebarmenu.js"></script>
+  <script src="/assets/js/app.min.js"></script>
+  <script src="/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+  <script src="/assets/libs/simplebar/dist/simplebar.js"></script>
+  <script src="/assets/js/dashboard.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+  <script src="https://cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
 
   <script>
-      $(document).ready(function () {
-          $('#login-form').on('submit', function (e) {
-              e.preventDefault();
-
-              function showErrorToast(errorMessage) {
+     function showErrorToast(errorMessage) {
                   var toast = $('#error-toast');
                   toast.find('.iq-alert-text').text(errorMessage);
                   toast.show();
@@ -66,6 +72,11 @@
                       toast.hide();
                   }, 3000);
               }
+  </script>
+  <script>
+      $(document).ready(function () {
+          $('#login-form').on('submit', function (e) {
+              e.preventDefault();
 
               var email = $('input[name="email"]').val();
               var password = $('input[name="password"]').val();
