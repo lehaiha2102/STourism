@@ -32,23 +32,36 @@ class RatingController extends Controller
         }
     }
 
-    use Illuminate\Support\Facades\DB;
-
     public function createRating(Request $request)
     {
         $userId = auth()->id();
+        $bookingId = $request->input('booking_id');
 
-        DB::table('rating')->insert([
-            'booker' => $userId,
-            'room_id' => $request->input('room_id'),
-            'booking_id' => $request->input('booking_id'),
-            'rating_star' => $request->input('rating_star'),
-            'comment' => $request->input('comment'),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $check = DB::table('booking')
+            ->where('id', $bookingId)
+            ->where('booker', $userId)
+            ->where('checkout_time', '<', now())
+            ->exists();
 
-        return response()->json(['message' => $userId], 200);
+        if ($check) {
+            $rating = DB::table('rating')->insertGetId([
+                'booker' => $userId,
+                'room_id' => $request->input('room_id'),
+                'booking_id' => $bookingId,
+                'rating_star' => $request->input('rating_star'),
+                'comment' => $request->input('comment'),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return response()->json(['status' => 'success', 'data' => $rating], 200);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Bạn không có quyền đánh giá phòng học này vào lúc này'], 500);
+        }
     }
 
+    public function getRatingWithBookingIf($bookingId){
+        $rating = DB::table('rating')->where('booking_id', '=', $bookingId)->first();
+        return response()->json(['status' => 'success', 'data' => $rating], 200);
+    }
 }

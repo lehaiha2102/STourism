@@ -74,3 +74,5 @@ Route::group(['middleware' => ['CheckLoginServer']], function () {
 
     Route::get('/admin/danh-gia', [\App\Http\Controllers\RatingController::class, 'index'])->name('rating');
 });
+
+Route::get('/payment-success/{bookingId}', [BookingController::class, 'bookingPayment']);

@@ -26,18 +26,87 @@ const BookingHistory = () => {
     const handleShow = () => setShow(true);
     const [newRating, setNewRating] = useState(5);
     const [valueRating, setvalueRating] = useState<IRating>();
+    const [isRating, setIsRating] = useState(false);
 
     const handleRatingChange = (updateRating) => {
         setNewRating(updateRating);
+    };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const token = localStorage.getItem(StorageKeys.jwt);
+                const res = await fetch(`http://127.0.0.1:8000/api/v2/booking/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (res.ok) {
+                    const { data } = await res.json();
+                    setHistory(data);
+                } else {
+                    console.error('Error fetching data:', res.statusText);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error.message);
+            }
+        };
+
+        if (id) {
+            fetchData();
+        }
+    }, [id]);  // Thêm token vào danh sách dependency để useEffect lắng nghe sự thay đổi của token
+
+
+    const { rooms, users, booking } = history;
+    const link = apiURL + '/api/v2/' + booking.id + '/' + users.id + '/' + rooms.id;
+
+    const handleRatingSubmit = async () => {
+        try {
+            const token = localStorage.getItem(StorageKeys.jwt);
+            const response = await fetch(`${apiURL}/api/v2/rating`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    booking_id: id,
+                    room_id: rooms.id,
+                    rating_star: valueRating ? valueRating.rating_star : newRating,
+                    comment: "Nội dung bình luận",
+                }),
+            });
+
+            if (response.ok) {
+                console.log('Đánh giá đã được gửi thành công!');
+            } else {
+                // Xử lý lỗi
+                console.error('Đã có lỗi khi gửi đánh giá:', response);
+            }
+        } catch (error) {
+            console.error('Đã có lỗi khi gửi đánh giá:', error);
+        }
     };
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch(`http://127.0.0.1:8000/api/v2/booking/${id}`);
+                const token = localStorage.getItem(StorageKeys.jwt);
+                const res = await fetch(`http://127.0.0.1:8000/api/v2/rating/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
                 if (res.ok) {
                     const { data } = await res.json();
-                    setHistory(data);
+                    setIsRating(true);
+                    setvalueRating(data);
 
                 } else {
                     console.error('Error fetching data:', res.statusText);
@@ -51,38 +120,6 @@ const BookingHistory = () => {
             fetchData();
         }
     }, [id]);
-
-    const { rooms, users, booking } = history;
-    const link = apiURL + '/api/v2/' + booking.id + '/' + users.id + '/' + rooms.id;
-
-    const handleRatingSubmit = async () => {
-        try {
-        const token = localStorage.getItem(StorageKeys.jwt);
-          const response = await fetch(`${apiURL}/api/v2/rating`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              booking_id: id,
-              room_id: rooms.id,
-              rating_star: valueRating ? valueRating.rate : newRating,
-              comment: "Nội dung bình luận",
-            }),
-          });
-      
-          if (response.ok) {
-            // Xử lý thành công
-            console.log('Đánh giá đã được gửi thành công!');
-          } else {
-            // Xử lý lỗi
-            console.error('Đã có lỗi khi gửi đánh giá:', response.statusText);
-          }
-        } catch (error) {
-          console.error('Đã có lỗi khi gửi đánh giá:', error.message);
-        }
-      };
     return (
         <Layout>
             <div className="container-xxl bg-white p-0">
@@ -131,8 +168,8 @@ const BookingHistory = () => {
                                         <span className="col-lg-6 col-md-6 col-12">Số tiền cần thanh toán trước</span>
                                         <span className="col-lg-6 col-md-6 col-12"><PriceFormatter price={booking.advance_payment} /></span>
                                         <span className="col-lg-6 col-md-6 col-12">Trạng thái</span>
-                                        <span className="col-lg-6 col-md-6 col-12">{booking.booking_status}</span>
-                                        {new Date() < new Date(booking.checkout_time) && (
+                                        <span className="col-lg-6 col-md-6 col-12">{booking.booking_status === 'success' ? 'Thanh toán thành công' : 'Giao dịch đang được xử lý'}</span>
+                                        {new Date() > new Date(booking.checkout_time) && (
                                             <button className="btn btn-primary mt-3" onClick={handleShow}>Đánh giá</button>
                                         )}
                                     </div>
@@ -164,7 +201,7 @@ const BookingHistory = () => {
                                 starDimension="65px"
                                 starSpacing="15px"
                                 name="rate"
-                                rating={valueRating?.rate}
+                                rating={valueRating?.rating_star}
                             />
                             :
                             <StarRatings
@@ -183,19 +220,22 @@ const BookingHistory = () => {
                     </div>
                     <div className='d-flex flex-column'>
                         <span>Bình luận về phòng</span>
-                        <input type='text' name='comment' />
+                        {valueRating ? <strong className='text-justify'>{valueRating.comment}</strong> :
+                            <input type='text' name='comment' />}
                     </div>
                     <input type='hidden' name='booking_id' value={id} />
                     <input type='hidden' name='room_id' value={rooms.id} />
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Hủy
-                    </Button>
-                    <Button variant="primary" onClick={handleRatingSubmit}>
-                        Đánh giá
-                    </Button>
-                </Modal.Footer>
+                {isRating ? '' :
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}>
+                            Hủy
+                        </Button>
+                        <Button variant="primary" onClick={handleRatingSubmit}>
+                            Đánh giá
+                        </Button>
+                    </Modal.Footer>
+                }
             </Modal>
         </Layout>
     );

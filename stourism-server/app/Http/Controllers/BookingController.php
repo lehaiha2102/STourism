@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\constant;
+use Illuminate\Http\RedirectResponse;
 
 class BookingController extends Controller
 {
@@ -20,12 +21,17 @@ class BookingController extends Controller
 
     public function newBookingPost(Request $request)
     {
+        $checkinTime = Carbon::parse($request->checkin);
+        $checkoutTime = Carbon::parse($request->checkout);
+        $durationInMinutes = $checkoutTime->diffInMinutes($checkinTime);
+        $totalPayment = $durationInMinutes * ($request->advance_payment / (24 * 60));
+
         $booking = DB::table('booking')->insertGetId([
             'booker' => $request->booker,
             'booker_email' => $request->email,
             'booker_phone' => $request->phone,
-            'booking_type' => $request->booking_type,
             'room_id' => $request->room_id,
+            'advance_payment' =>  $totalPayment,
             'checkin_time' => $request->checkin,
             'checkout_time' => $request->checkout,
             'created_at' => now(),
@@ -33,12 +39,12 @@ class BookingController extends Controller
         ]);
 
         $vnp_TxnRef = $booking;
-        $vnp_Amount = $request->input('price');
+        $vnp_Amount = $totalPayment;
         $vnp_Locale = 'vn';
         $vnp_BankCode = $request->input('bankCode');
         $vnp_IpAddr = $request->ip();
-        $vnp_TmnCode = "BFE3ZL6D";
-        $vnp_HashSecret = "XIQPVJOWWPFNLQCFYEDWVOMFIGDNSBBW";
+        $vnp_TmnCode = "WM02HBYY";
+        $vnp_HashSecret = "SYYTJTDERZZYJTWYFMHALGUNDJEFWPEO";
         $startTime = date("YmdHis");
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
         $inputData = [
@@ -52,7 +58,7 @@ class BookingController extends Controller
             "vnp_Locale" => $vnp_Locale,
             "vnp_OrderInfo" => "Thanh toan GD:" . $vnp_TxnRef,
             "vnp_OrderType" => "other",
-            "vnp_ReturnUrl" => "http://localhost:3000/lich-su/". $booking, 
+            "vnp_ReturnUrl" => "http://localhost:8000/payment-success/". $booking,
             "vnp_TxnRef" => $vnp_TxnRef,
             "vnp_ExpireDate" => date('YmdHis',strtotime('+720 minutes',strtotime($startTime))),
         ];
@@ -85,7 +91,22 @@ class BookingController extends Controller
             'status' => 'success',
             'data' => $booking,
             'url' => $vnp_Url,
+            'hashdata' => $hashdata,
+            'hashSecret' => $vnp_HashSecret,
         ]);
+    }
+
+    public function bookingPayment($bookingId){
+        $booking = DB::table('booking')->where('id', $bookingId)->first();
+
+        if($booking){
+            DB::table('booking')->where('id', $bookingId)->update([
+                'advance_payment_check' => true,
+                'booking_status' => 'success',
+            ]);
+            $externalUrl = 'http://localhost:3000/lich-su/'.$bookingId;
+            return new RedirectResponse($externalUrl);
+        }
     }
 
     public function bookingEdit($bookingId)

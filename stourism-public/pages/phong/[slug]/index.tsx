@@ -24,6 +24,8 @@ const Room = () => {
                 if (res.ok) {
                     const { data } = await res.json();
                     setRoom(data);
+                    console.log('data', data);
+                    
                 } else {
                     console.error('Error fetching data:', res.statusText);
                 }
@@ -36,7 +38,6 @@ const Room = () => {
             fetchData();
         }
     }, [slug]);
-    console.log(room)
     return (
         <Layout>
             <div className="container-xxl bg-white p-0">

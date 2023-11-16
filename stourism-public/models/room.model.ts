@@ -3,7 +3,7 @@ interface IRoom {
     room_name: string;
     room_slug: string;
     product_id: number;
-    room_image: string[];
+    room_image: any | any[];
     room_quantity: number;
     adult_capacity: number;
     children_capacity: number;

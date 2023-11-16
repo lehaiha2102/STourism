@@ -1,14 +1,13 @@
-import { RatingStatus } from 'app/shared/model/enumerations/rating-status.model';
 import IUser from './user.model';
 
 export interface IRating {
   id?: number;
   comment?: string;
-  rate?: number;
+  rating_star?: number;
   createdAt?: string;
-  userInfoId?: number;
+  booker?: number;
   userInfo?: IUser;
-  bookingId?: number;
+  booking_id?: number;
   ratingRoomAvg?: number;
   ratingRoomCount?: number;
 }

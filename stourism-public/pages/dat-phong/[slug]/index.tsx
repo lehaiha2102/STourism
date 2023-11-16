@@ -54,10 +54,12 @@ const Booking = () => {
 
     const bookRoom = async () => {
         try {
+            const token = localStorage.getItem(StorageKeys.jwt);
             const response = await fetch(`${apiURL}/api/v2/booking`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     booker: booker?.id,
@@ -66,7 +68,6 @@ const Booking = () => {
                     checkin: document.getElementById('checkin').value,
                     checkout: document.getElementById('checkout').value,
                     room_id: room?.id,
-                    booking_type: 'Pay upon check-in',
                     price: room?.room_rental_price,
                 }),
             });
@@ -76,12 +77,8 @@ const Booking = () => {
             }
     
             const data = await response.json();
-            const status = data.status;
-            const bookingData = data.data;
-            const vnpUrl = data.url;
-    console.log(vnpUrl);
-    
-            // Tiếp tục xử lý dữ liệu nếu cần
+            const vnpUrl = data.url;   
+            router.push(vnpUrl);
         } catch (error) {
             console.error('Error when booking:', error);
         }
