@@ -42,7 +42,9 @@ const Layout = ({ children }: Props) => {
         <script src="/js/main.js"></script>
       </Head>
       <Header/>
-      {children}
+      <div  className='bg-white'>
+        {children}
+      </div>
       <Footer />
       <a href="#" className="btn btn-lg btn-primary btn-lg-square back-to-top"><i className="bi bi-arrow-up"></i></a>
     </div>

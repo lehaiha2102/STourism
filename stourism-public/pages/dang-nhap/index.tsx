@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { SyntheticEvent, useState, useEffect } from 'react';
 import SignLayout from '../../components/SignLayout';
 import { StorageKeys } from '../../utils/constant';
-import { log } from 'console';
 
 const Signin = () => {
     const [email, setEmail] = useState("");

@@ -20,12 +20,12 @@ use App\Http\Controllers\AuthController;
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
-
-Route::post('/v2/reset-password', [AuthController::class, 'resetPassword'])->name('resetPassword');
-Route::post('/v2/booking', [\App\Http\Controllers\BookingController::class, 'newBookingPost']);
-Route::get('/v2/booking/{bookingId}', [\App\Http\Controllers\BookingController::class, 'bookingById']);
-Route::post('/v2/rating', [\App\Http\Controllers\RatingController::class, 'createRating']);
-Route::get('/v2/rating/{bookingId}', [\App\Http\Controllers\RatingController::class, 'getRatingWithBookingIf']);
+    Route::post('/v2/reset-password', [AuthController::class, 'resetPassword'])->name('resetPassword');
+    Route::post('/v2/booking', [\App\Http\Controllers\BookingController::class, 'newBookingPost']);
+    Route::get('/v2/booking/get-all-my-booking', [\App\Http\Controllers\BookingController::class, 'getAllMyBooking']);
+    Route::get('/v2/booking/{bookingId}', [\App\Http\Controllers\BookingController::class, 'bookingById']);
+    Route::post('/v2/rating', [\App\Http\Controllers\RatingController::class, 'createRating']);
+    Route::get('/v2/rating/{bookingId}', [\App\Http\Controllers\RatingController::class, 'getRatingWithBookingIf']);
 });
 Route::post('/v2/login', [AuthController::class, 'login'])->name('login');
 Route::post('/v2/register', [AuthController::class, 'register'])->name('registerPost');

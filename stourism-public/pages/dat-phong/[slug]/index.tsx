@@ -1,12 +1,19 @@
-import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import ReactHtmlParser from 'react-html-parser';
 import Layout from '../../../components/Layout';
-import { StorageKeys, apiURL, vnpUrl } from '../../../utils/constant';
 import IRoom from "../../../models/room.model";
-import { log } from "console";
+import { StorageKeys, apiURL } from '../../../utils/constant';
+import { PriceFormatter } from '../../../utils/priceFormat';
 
+const limit = (htmlString, maxLength) => {
+    if (htmlString?.length > maxLength) {
+      const truncatedHtml = htmlString?.substring(0, maxLength) + '...';
+      return truncatedHtml;
+    }
+    return htmlString;
+  };
 
 const Booking = () => {
     const router = useRouter();
@@ -36,7 +43,7 @@ const Booking = () => {
                 const res = await fetch(`http://127.0.0.1:8000/api/v2/${slug}/rooms`);
                 if (res.ok) {
                     const { data } = await res.json();
-                    
+
                     setRoom(data);
 
                 } else {
@@ -71,19 +78,20 @@ const Booking = () => {
                     price: room?.room_rental_price,
                 }),
             });
-    
+
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-    
+
             const data = await response.json();
-            const vnpUrl = data.url;   
+            const vnpUrl = data.url;
             router.push(vnpUrl);
         } catch (error) {
             console.error('Error when booking:', error);
         }
     };
-    
+
+    const truncatedDescription = limit(room?.room_description, 150);
 
     return (
         <Layout>
@@ -106,10 +114,10 @@ const Booking = () => {
             <div className="container-xxl mb-5">
                 <div className="container">
                     <div className="text-center wow fadeInUp mb-5" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
-                        <h6 className="section-title text-center text-primary text-uppercase">Hoàn thiện thông tin trước khi đăt phòng</h6>
+                        <h2 className="section-title text-center text-primary text-uppercase">Thông tin đặt phòng</h2>
                     </div>
                     <div className="row g-5 d-flex justify-content-center align-content-center">
-                        <div className="col-lg-8 d-flex justify-content-center align-content-center">
+                        <div className="col-lg-6 d-flex justify-content-center align-content-center">
                             <div className="wow fadeInUp" data-wow-delay="0.2s" style={{ visibility: 'visible', animationDelay: '0.2s', animationName: 'fadeInUp' }}>
                                 <form>
                                     <div className="row g-3">
@@ -133,66 +141,70 @@ const Booking = () => {
                                         </div>
                                         <div className="col-md-12">
                                             <div className="form-floating date" id="date3" data-target-input="nearest">
-                                                <input type="datetime-local" className="form-control datetimepicker-input" id="checkin" placeholder="Thời gian nhận phòng" />
+                                                <input type="date" className="form-control datetimepicker-input" id="checkin" placeholder="Thời gian nhận phòng" />
                                                 <label htmlFor="checkin">Thời gian nhận phòng</label>
                                             </div>
                                         </div>
                                         <div className="col-md-12">
                                             <div className="form-floating date" id="date4" data-target-input="nearest">
-                                                <input type="datetime-local" className="form-control datetimepicker-input" id="checkout" placeholder="Thời gian trả phòng" />
+                                                <input type="date" className="form-control datetimepicker-input" id="checkout" placeholder="Thời gian trả phòng" />
                                                 <label htmlFor="checkout">Thời gian trả phòng</label>
                                             </div>
+                                        </div>
+                                        <div className="col-md-12">
+                                            {isLoggedIn ? (
+                                                <div>
+                                                    {booking && booking == true ? '' : <button className="btn btn-primary w-100 py-3 mb-3 rounded" onClick={bookRoom}>Xác nhận</button>}
+                                                </div>
+                                            ) : (
+                                                <Link
+                                                    className="btn btn-primary w-100 py-3"
+                                                    href={`/dang-nhap?dat-phong/${room?.room_name}`}
+                                                >
+                                                    Vui lòng đăng nhập để thực hiện đặt phòng
+                                                </Link>
+                                            )}
                                         </div>
                                     </div>
                                 </form>
                             </div>
                         </div>
-                        <div className="col-lg-8">
-                            {isLoggedIn ? (
-                                <div>
-                                    {booking && booking == true ? '' : <button className="btn btn-primary w-100 py-3 mb-3 rounded" onClick={bookRoom}>Xác nhận</button>}
-                                    {/* {booking && booking == true ?
-                                        <PayPalScriptProvider
-                                            options={{
-                                                clientId: "Ac5e4GqEHjI1z8qIbZpv60vDrH2fyG0HvvIxQV5Porhb2SrGr58E49WCwOUb5hvZtDqfD6dF0IfLkRtK",
-                                            }}
-                                        >
-                                            <PayPalButtons
-                                                createOrder={(data, actions) => {
-                                                    // Đơn hàng PayPal sẽ được tạo khi người dùng nhấn nút thanh toán
-                                                    return actions.order.create({
-                                                        purchase_units: [
-                                                            {
-                                                                amount: {
-                                                                    value: '10.00', // Thay bằng giá trị cần thanh toán
-                                                                },
-                                                                description: 'Thanh toán đặt phòng',
-                                                            },
-                                                        ],
-                                                    });
-                                                }}
-                                                onApprove={(data, actions) => {
-                                                    // Xác nhận thanh toán thành công, có thể gửi thông tin đến server
-                                                    return actions.order.capture().then(details => {
-                                                        console.log('Payment details:', details);
-                                                        // Gọi hàm xử lý thanh toán sau khi xác nhận thành công
-                                                        handlePaymentSuccess(details);
-                                                    });
-                                                }}
-                                            />
-                                        </PayPalScriptProvider>
-                                        : ''} */}
-                                </div>
-                            ) : (
-                                <Link
-                                    className="btn btn-primary w-100 py-3"
-                                    href={`/dang-nhap?dat-phong/${room?.room_name}`}
-                                >
-                                    Vui lòng đăng nhập để thực hiện đặt phòng
-                                </Link>
+                        <div className="col-lg-4">
+                            <div style={{ border: '1px solid #e9ecef', padding: 10, borderRadius: 5}}>
+                            <h3 className="section-title text-start text-primary text-uppercase mb-3">{room ? room?.room_name : <p>Loading...</p>}</h3>
+                            {room?.room_image && room?.room_image.length > 0 && (
+                                <img
+                                    className="img-fluid rounded w-100 wow zoomIn"
+                                    src={`${apiURL}/images/${JSON.parse(room.room_image)[0]}`}
+                                    data-wow-delay="0.1s"
+                                    style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'zoomIn' }}
+                                />
                             )}
+                            <p className='my-3'>
+                            {ReactHtmlParser(truncatedDescription)}
+                            </p>
+                            <p>Tối đa: {room?.adult_capacity} người lớn {room?.children_capacity ? 'và' + room?.children_capacity + 'trẻ em' : ''}</p>
+                            <p>Giá phòng: <PriceFormatter price={room?.room_rental_price}/></p>
+                            </div>
                         </div>
-
+                    </div>
+                </div>
+            </div>
+            <div className="container-xxl py-5 d-flex justify-content-center">
+                <div className="container row g-4">
+                    <div className="col-lg-12 col-md-12 bg-white wow fadeInUp" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
+                        <div className="rounded shadow overflow-hidden row py-5">
+                            <div className="text-center wow fadeInUp mb-5" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
+                                <h6 className="section-title text-center text-primary text-uppercase">Quy định về đặt phòng</h6>
+                            </div>
+                            <ul className='mx-3'>
+                                <li>Thời gian đặt phòng phải được thực hiện trước thời gian nhận phòng 12 giờ.</li>
+                                <li>Thời gian nhận phòng phải trước 12 giờ trưa.</li>
+                                <li>Thời gian trả phòng vào lúc 12 giờ trưa. Lưu ý nếu bạn trả phòng muộn, bạn sẽ phải trả thêm phí dịch vụ là 100.000 đ /1 giờ</li>
+                                <li>Trong trường hợp bạn trả phòng sớm hơn dự kiến, chúng tôi không hoàn lại phần tiền thừa.</li>
+                                <li>Việc hủy phòng phải được thực hiện sớm nhất có thể (tối đa 8 giờ sau khi đặt phòng thành công để không mất phí, trong trường hợp còn lại, bạn có thể sẽ mất 5% số tiền phòng đã đặt.)</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

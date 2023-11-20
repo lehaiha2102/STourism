@@ -202,4 +202,17 @@ class BookingController extends Controller
             return response()->json(['status' => 'fail', 'messenger' =>'Booking not found']);
         }
     }
+
+    public function getAllMyBooking(){
+        $userId = auth()->id();
+
+        $booking = DB::table('booking')
+        ->join('rooms', 'booking.room_id', '=', 'rooms.id')
+        ->leftJoin('rating', 'booking.id', '=', 'rating.booking_id') // Fixed the join condition
+        ->select('booking.*', 'rating.*', 'rooms.*') // Select all columns from booking, rating, and rooms
+        ->where('booking.booker', '=', $userId)
+        ->where('booking.booking_status', '=', 'success')
+            ->get();
+        return response()->json(['data' => $booking], 200);
+    }
 }

@@ -6,11 +6,11 @@ interface IProduct {
     product_phone?: string;
     product_email?: string;
     product_main_image?: string;
-    product_image?: string[];
+    product_image?: any;
     business_id?: number;
     product_description?: string;
     product_status?: boolean;
-    product_service?: string[];
+    product_service?: any;
     ward_id?: number;
     created_at?: string;
     updated_at?: string;
