@@ -126,9 +126,9 @@
                     },
                     success: function (response) {
                         if (response.status === 'success') {
-                            window.location.href = '/admin/san-pham';
+                            window.location.href = '/admin/san-pham?create-success';
                         } else {
-                            alert('Có lỗi trong quá trình thêm mới danh mục. Vui lòng thử lại.');
+                            showToast('Có lỗi trong quá trình thêm mới sản phẩm. Vui lòng thử lại.', 'error');
                         }
                     },
                     error: function (xhr) {

@@ -20,6 +20,6 @@ class CheckLoginServer
             return $next($request);
         }
 
-        return redirect()->route('loginView');
+        return redirect()->route('admin.loginView');
     }
 }

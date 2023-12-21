@@ -37,12 +37,12 @@
                     <input type="password" name="password" class="form-control" id="exampleInputPassword1">
                   </div>
                   <div class="d-flex align-items-center justify-content-between mb-4">
-                    <a class="text-primary fw-bold" href="{{ route('forgotPasswordView') }}">Quên mật khẩu ?</a>
+                    <a class="text-primary fw-bold" href="{{ route('admin.forgotPasswordView') }}">Quên mật khẩu ?</a>
                   </div>
                   <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Đăng nhập</button>
                   <div class="d-flex align-items-center justify-content-center">
                     <p class="fs-4 mb-0 fw-bold">STourism mới?</p>
-                    <a class="text-primary fw-bold ms-2" href="{{ route('registerView') }}">Đăng ký tài khoản mới.</a>
+                    <a class="text-primary fw-bold ms-2" href="{{ route('admin.registerView') }}">Đăng ký tài khoản mới.</a>
                   </div>
                 </form>
               </div>
@@ -123,6 +123,8 @@
                                   errorMessage += errors[error][0] + '\n';
                               }
                               showErrorToast(errorMessage);
+                          } else if (xhr.status === 500) {
+                              showErrorToast('Your account has been banned');
                           } else {
                               alert('There was an error during the login process. Please try again!');
                           }

@@ -10,8 +10,29 @@ use Illuminate\Http\RedirectResponse;
 class BookingController extends Controller
 {
     public function index(){
-        $booking = DB::table('booking')->paginate(50);
-        return view('booking.index', compact('booking'));
+        if (session('user')) {
+            $user = session('user')->id;
+            $role_id = session('permission')->role_id;
+
+            if ($role_id == 1) {
+                $booking = DB::table('booking')
+                    ->join('users', 'booking.booker', '=', 'users.id')
+                    ->join('rooms', 'booking.room_id', '=', 'rooms.id')
+                    ->select('booking.*', 'users.full_name', 'rooms.room_name')
+                    ->paginate(50);
+            } else if($role_id == 2) {
+                $booking = DB::table('booking')
+                    ->join('users as booker_user', 'booking.booker', '=', 'booker_user.id')
+                    ->join('rooms', 'booking.room_id', '=', 'rooms.id')
+                    ->join('products', 'rooms.product_id', '=', 'products.id')
+                    ->join('business', 'products.business_id', '=', 'business.id')
+                    ->join('users as business_user', 'business.user_id', '=', 'business_user.id')
+                    ->select('booking.*', 'booker_user.full_name as booker_name', 'rooms.room_name')
+                    ->where('business_user.id', '=', $user)
+                    ->paginate(30);
+            }
+            return view('post.index', compact('booking'));
+        }
     }
     public function newBooking(){
         $rooms = DB::table('rooms')->get();
@@ -23,15 +44,14 @@ class BookingController extends Controller
     {
         $checkinTime = Carbon::parse($request->checkin);
         $checkoutTime = Carbon::parse($request->checkout);
-        $durationInMinutes = $checkoutTime->diffInMinutes($checkinTime);
-        $totalPayment = $durationInMinutes * ($request->advance_payment / (24 * 60));
-
+        $durationInDays = $checkoutTime->diffInDays($checkinTime);
+        $totalPayment = $durationInDays * $request->price;
         $booking = DB::table('booking')->insertGetId([
             'booker' => $request->booker,
             'booker_email' => $request->email,
             'booker_phone' => $request->phone,
             'room_id' => $request->room_id,
-            'advance_payment' =>  $totalPayment,
+            'payment' =>  $totalPayment,
             'checkin_time' => $request->checkin,
             'checkout_time' => $request->checkout,
             'created_at' => now(),
@@ -146,8 +166,8 @@ class BookingController extends Controller
                 'booking_status' => $request->booking_status,
                 'checkin_time' => $request->checkin_time,
                 'checkout_time' => $request->checkout_time,
-                'advance_payment_check' => $request->advance_payment_check,
-                'advance_payment' => $request->advance_payment,
+                'payment_check' => $request->advance_payment_check,
+                'payment' => $request->advance_payment,
                 'updated_at' => now(),
             ]);
             return response()->json(['status' => 'success']);

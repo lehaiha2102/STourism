@@ -1,9 +1,8 @@
 $(function () {
-
-
   // =====================================
   // Profit
   // =====================================
+  var daysOfMonth = (document.getElementById('chart').getAttribute('data-advance-payment-by-day'));
   var chart = {
     series: [
       { name: "Earnings this month:", data: [355, 390, 300, 350, 390, 180, 355, 390] },
@@ -57,7 +56,7 @@ $(function () {
 
     xaxis: {
       type: "category",
-      categories: ["16/08", "17/08", "18/08", "19/08", "20/08", "21/08", "22/08", "23/08"],
+      categories: daysOfMonth,
       labels: {
         style: { cssClass: "grey--text lighten-2--text fill-color" },
       },
@@ -164,6 +163,7 @@ $(function () {
   // =====================================
   // Earning
   // =====================================
+  var advancePaymentByDayData = JSON.parse(document.getElementById('earning').getAttribute('data-advance-payment-by-day'));
   var earning = {
     chart: {
       id: "sparkline3",
@@ -178,9 +178,9 @@ $(function () {
     },
     series: [
       {
-        name: "Earnings",
+        name: "Thu nhập",
         color: "#49BEFF",
-        data: [25, 66, 20, 40, 12, 58, 20],
+        data: Object.values(advancePaymentByDayData),
       },
     ],
     stroke: {

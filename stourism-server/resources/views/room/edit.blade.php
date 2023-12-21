@@ -62,6 +62,18 @@
         CKEDITOR.replace('editor');
     </script>
     <script>
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                close: true,
+                backgroundColor: type === 'success' ? '#2ecc71' : '#e74c3c',
+            }).showToast();
+        }
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const fileInput = document.getElementById('exampleInputPassword3');
             const previewImg = document.getElementById('preview-avatar');
@@ -93,9 +105,20 @@
                     },
                     success: function (response) {
                         if (response.status === 'success') {
-                            window.location.href = '/admin/phong';
+                            window.location.href = '/admin/phong?update-success';
                         } else {
-                            alert('Có lỗi trong quá trình thêm mới danh mục. Vui lòng thử lại.');
+                            showToast('Có lỗi trong quá trình chỉnh sửa phòng. Vui lòng thử lại.', 'error');
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            var errors = xhr.responseJSON.errors;
+                            $.each(errors, function (key, value) {
+                                showToast(value, 'error');
+                            });
+                        } else {
+                            console.log(xhr)
+                            showToast('Có lỗi trong quá trình cập nhật phòng. Vui lòng thử lại.');
                         }
                     }
                 });

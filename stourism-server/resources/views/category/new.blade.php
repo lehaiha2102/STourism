@@ -21,12 +21,15 @@
                             <div class="mb-3">
                                 <label for="exampleInputPassword3" class="form-label">Avatar</label>
                                 <input type="file" name="category_image" class="form-control" id="exampleInputPassword3">
-                                <img id="preview-avatar" src="#" alt="Preview" style="display:none; max-width:160px; height:80px;">
+                                <img id="preview-avatar" src="#" alt="Preview"
+                                    style="display:none; max-width:160px; height:80px;">
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputPassword4" class="form-label">Banner</label>
-                                <input type="file" name="category_banner" class="form-control" id="exampleInputPassword4">
-                                <img id="preview-banner" src="#" alt="Preview" style="display:none; max-width:160px; height:80px;">
+                                <input type="file" name="category_banner" class="form-control"
+                                    id="exampleInputPassword4">
+                                <img id="preview-banner" src="#" alt="Preview"
+                                    style="display:none; max-width:160px; height:80px;">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Mô tả</label>
@@ -40,7 +43,7 @@
         </div>
     </div>
     <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
-    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="//cdn.ckeditor.com/4.23.0-lts/full/ckeditor.js"></script>
     <script>
         CKEDITOR.replace('editor');
     </script>
@@ -73,8 +76,8 @@
         });
     </script>
     <script>
-        $(document).ready(function () {
-            $('#category-form').on('submit', function (e) {
+        $(document).ready(function() {
+            $('#category-form').on('submit', function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
                 $.ajax({
@@ -87,21 +90,21 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                         'Accept': 'application/json'
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.status === 'success') {
-                            showToast('Thao tác thành công', 'success');
-                            window.location.href = '/admin/danh-muc';
+                            window.location.href = '/admin/danh-muc?create-success';
                         }
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         if (xhr.status === 422) {
                             var errors = xhr.responseJSON.errors;
-                            $.each(errors, function (key, value) {
+                            $.each(errors, function(key, value) {
                                 showToast(value, 'error');
                             });
                         } else {
                             console.log(xhr)
-                            alert('Có lỗi trong quá trình thêm mới danh mục. Vui lòng thử lại.');
+                            alert(
+                            'Có lỗi trong quá trình thêm mới danh mục. Vui lòng thử lại.');
                         }
                     }
                 });

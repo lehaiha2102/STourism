@@ -63,7 +63,7 @@
                                     </div>
                                 @endforeach
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Số điện thoại</label>
                                 <input type="text" name="product_phone" value="{{ $product->product_phone }}"
@@ -110,6 +110,18 @@
         CKEDITOR.replace('editor');
     </script>
     <script>
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                close: true,
+                backgroundColor: type === 'success' ? '#2ecc71' : '#e74c3c',
+            }).showToast();
+        }
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const fileInput = document.getElementById('exampleInputPassword3');
             const previewImg = document.getElementById('preview-avatar');
@@ -144,7 +156,7 @@
                 const productSlug = $('#product-slug').val();
                 var formData = new FormData(this);
                 $.ajax({
-                    type: 'POST',
+                    type: 'post',
                     url: '/admin/san-pham/' + productSlug + '/cap-nhat',
                     data: formData,
                     processData: false,
@@ -155,10 +167,9 @@
                     },
                     success: function(response) {
                         if (response.status === 'success') {
-                            window.location.href = '/admin/san-pham';
+                            window.location.href = '/admin/san-pham?update-success';
                         } else {
-                            alert(
-                            'Có lỗi trong quá trình thêm mới danh mục. Vui lòng thử lại.');
+                            showToast('Có lỗi trong quá trình thêm mới sản phẩm. Vui lòng thử lại.', 'error');
                         }
                     },
                     error: function(xhr) {

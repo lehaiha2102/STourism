@@ -93,7 +93,7 @@
                     },
                     success: function (response) {
                         if (response.status === 'success') {
-                            window.location.href = '/admin/danh-muc';
+                            window.location.href = '/admin/danh-muc?update-success';
                         }
                     },
                     error: function (xhr) {
@@ -104,7 +104,7 @@
                             });
                         } else {
                             console.log(xhr)
-                            alert('Có lỗi trong quá trình thêm mới danh mục. Vui lòng thử lại.');
+                            alert('Có lỗi trong quá trình cập nhật danh mục. Vui lòng thử lại.');
                         }
                     }
                 });

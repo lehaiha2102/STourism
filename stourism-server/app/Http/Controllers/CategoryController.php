@@ -135,9 +135,9 @@ class CategoryController extends Controller
         }
     }
 
-    public function categoryDestroy($category_slug)
+    public function categoryDestroy($id)
     {
-        $category = DB::table('categories')->where('category_slug', $category_slug)->first();
+        $category = DB::table('categories')->where('id', $id)->first();
         if ($category) {
             $imagePath = public_path('images/' . $category->category_image);
             $bannerPath = public_path('images/' . $category->category_banner);
@@ -150,11 +150,15 @@ class CategoryController extends Controller
                 File::delete($bannerPath);
             }
 
-            DB::table('categories')->where('category_slug', $category_slug)->delete();
+            DB::table('categories')->where('id', $id)->delete();
             return response()->json([
                 'status' => 'success',
                 'message' => 'Xóa danh mục thành công.'
             ]);
         }
+        return response()->json([
+            'status' => 'failure',
+            'message' => 'Xóa danh mục thất bại vì không tìm thấy danh mục.'
+        ]);
     }
 }

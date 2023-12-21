@@ -40,7 +40,7 @@
                             </thead>
                             <tbody>
                             @foreach($business as $index => $b)
-                                <tr>
+                                <tr data-key="{{ $b->id }}">
                                     <td class="border-bottom-0"><h6 class="fw-semibold mb-0">{{ $index + 1 }}</h6></td>
                                     <td class="border-bottom-0">
                                         <h6 class="fw-semibold mb-1">{{ $b->business_name }}</h6>
@@ -74,9 +74,11 @@
                                     </td>
                                     <td class="border-bottom-0">
                                         <a class="btn btn-outline-warning m-1" href="{{ route('business.edit', ['business_slug' => $b->business_slug])  }}">Chỉnh sửa</a>
-                                        <button type="button" class="btn btn-outline-danger m-1" data-id="{{$b->id}}" data-toggle="modal" data-target="#exampleModal{{$b->id}}">
-                                            <i class="pe-7s-trash"></i>
-                                        </button>
+                                        <button type="button" class="btn btn-outline-danger m-1"
+                                                data-id="{{ $b->id }}" data-toggle="modal"
+                                                data-target="#exampleModal{{ $b->id }}">
+                                                Xóa
+                                            </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -92,20 +94,42 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Xóa danh mục</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Xóa doanh nghiệp</h5>
                     </div>
                     <div class="modal-body">
                         <p class="mb-0">Bạn có chắc chắn muốn xóa <span style="color:red">{{$b->business_name}}</span>?</p>
-                        <form id="delete-business">
-                            <input class="my-3" type="hidden" name="id" id="business_slug_delete" value="{{$b->business_slug}}">
-                            <button class="btn btn-danger my-3" type="submit">Xóa</button>
-                        </form>
+                        <button class="btn btn-danger my-3 delete" data-id="{{ $b->id }}">Xóa</button >
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
     @endforeach
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script>
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                close: true,
+                backgroundColor: type === 'success' ? '#2ecc71' : '#e74c3c',
+            }).showToast();
+        }
+    </script>
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('update-success')) {
+            // Hiển thị toast
+            showToast('Cập nhật doanh nghiệp thành công', 'success');
+            history.replaceState({}, document.title, window.location.pathname);
+        } else if (urlParams.has('create-success')) {
+            // Hiển thị toast
+            showToast('Thêm mới doanh nghiệp thành công', 'success');
+            history.replaceState({}, document.title, window.location.pathname);
+        }
+    </script>
     <script>
         $(document).ready(function() {
             $('.status-toggle').click(function() {
@@ -129,9 +153,9 @@
                             var newStatusHtml = new_status == 1 ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Còn hoạt động</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Tạm ngừng hoạt động</span>';
                             $('.status-toggle[data-business-id="' + business_id + '"]').data('status', new_status);
                             $('.status-toggle[data-business-id="' + business_id + '"]').html(newStatusHtml);
-                            alert(response.message);
+                            showToast(response.message);
                         } else {
-                            alert(response.message);
+                            showToast(response.message);
                         }
                     },
                 });
@@ -139,22 +163,37 @@
         });
     </script>
     <script>
-        $(document).ready(function () {
-            $('#delete-business').on('submit', function (e) {
-                e.preventDefault();
-                var businessSlug = $('#business_slug_delete').val();
+        $(document).ready(function() {
+            $(".delete").click(function() {
+                var button = $(this);
+                var id = button.data("id");
 
                 $.ajax({
+                    url: "/admin/doanh-nghiep/" + id + '/xoa',
                     type: 'DELETE',
-                    url: '/admin/doanh-nghiep/'+ businessSlug +'/xoa',
+                    data: {
+                        "id": id,
+                    },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                         'Accept': 'application/json'
                     },
-                    success: function (response) {
-                        if(response.status === 'success'){
-                            alert('xóa thành công');
-                            window.location.href = '/admin/doanh-nghiep';
+                    success: function() {
+                        showToast('Xóa doanh nghiệp thành công', 'success');
+                        var key = button.data('id');
+                        $('tr[data-key="' + key + '"]').remove();
+                        $('[data-dismiss="modal"]').trigger('click');
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            var errors = xhr.responseJSON.errors;
+                            $.each(errors, function(key, value) {
+                                showToast(value, 'error');
+                            });
+                        } else {
+                            console.log(xhr);
+                            alert(
+                            'Có lỗi trong quá trình thêm mới doanh nghiệp. Vui lòng thử lại.');
                         }
                     }
                 });

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CategoriesEditRequest extends FormRequest
 {
@@ -19,7 +20,7 @@ class CategoriesEditRequest extends FormRequest
     public function rules()
     {
         return [
-            'category_name' => 'required|string|max:255',
+            'category_name' => 'required|string|max:255|unique:categories,category_name',
             'category_image' => 'image|mimes:jpeg,png|max:2048',
             'category_banner' => 'image|mimes:jpeg,png|max:2048',
             'category_status' => 'required|boolean',
@@ -54,6 +55,7 @@ class CategoriesEditRequest extends FormRequest
             'category_name.required' => 'Tên danh mục là bắt buộc.',
             'category_name.string' => 'Tên danh mục phải là một chuỗi.',
             'category_name.max' => 'Tên danh mục không được vượt quá :max ký tự.',
+            'category_name.unique' => 'Tên danh mục đã tồn tại.',
 
             'category_image.image' => 'Trường này chỉ chấp nhận file hình ảnh.',
             'category_image.mimes' => 'Chỉ chấp nhận file ảnh định dạng JPEG hoặc PNG.',

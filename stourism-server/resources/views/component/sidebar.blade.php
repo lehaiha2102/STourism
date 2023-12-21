@@ -76,6 +76,23 @@
               <span class="hide-menu">Đánh giá</span>
             </a>
           </li>
+          <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ route('postAdmin') }}" aria-expanded="false">
+              <span>
+                <i class="ti ti-file-description"></i>
+              </span>
+              <span class="hide-menu">Bài viết</span>
+            </a>
+          </li>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ route('user') }}" aria-expanded="false">
+          <span>
+            <i class="ti ti-file-description"></i>
+          </span>
+                <span class="hide-menu">Người dùng</span>
+            </a>
+        </li>
         </ul>
       </nav>
       <!-- End Sidebar navigation -->

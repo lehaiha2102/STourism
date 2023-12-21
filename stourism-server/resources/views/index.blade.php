@@ -1,361 +1,295 @@
 @extends('component.index')
 @section('content')
-    <h1>Danh sách Session:</h1>
-    <ul>
-        @foreach(session()->all() as $key => $value)
-            <li><strong>{{ $key }}:</strong>
-                @if(is_string($value))
-                    {{ $value }}
-                @else
-                    {{ var_dump($value) }}
-                @endif
-            </li>
-        @endforeach
-    </ul>
+    <div class="row mx-2">
+        <div class="row col-lg-12 col-md-12 col-12 border shadow p-3 mb-5 bg-white rounded">
+            <div class="col-lg-4 col-md-4 col-12 border">
+                <div class="d-flex justify-content-between align-items-center py-3">
+                    <span>
+                        <i class="ti ti-user" style="font-size: 30px; color: green"></i>
+                    </span>
+                    <div class="d-flex flex-column justify-content-center align-items-center" style="font-weight: bold">
+                        <span>{{ $totalUsers }}</span>
+                        <span>Người dùng</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-12 border">
+                <div class="d-flex justify-content-between align-items-center py-3">
+                    <span>
+                        <i class="ti ti-map-pin" style="font-size: 30px; color: red"></i>
+                    </span>
+                    <div class="d-flex flex-column justify-content-center align-items-center" style="font-weight: bold">
+                        <span>{{ $operationScope }}</span>
+                        <span>Khu vực</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-12 border">
+                <div class="d-flex justify-content-between align-items-center py-3">
+                    <span>
+                        <i class="ti ti-heart-handshake" style="font-size: 30px; color: yellow"></i>
+                    </span>
+                    <div class="d-flex flex-column justify-content-center align-items-center" style="font-weight: bold">
+                        <span>{{ $totalBusiness }}</span>
+                        <span>Doanh nghiệp</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-12 border">
+                <div class="d-flex justify-content-between align-items-center py-3">
+                    <span>
+                        <i class="ti ti-map" style="font-size: 30px; color: blue"></i>
+                    </span>
+                    <div class="d-flex flex-column justify-content-center align-items-center" style="font-weight: bold">
+                        <span>{{ $travelPlace }}</span>
+                        <span>Địa điểm du lịch</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-12 border">
+                <div class="d-flex justify-content-between align-items-center py-3">
+                    <span>
+                        <i class="ti ti-blockquote" style="font-size: 30px; color: rgb(0, 0, 0)"></i>
+                    </span>
+                    <div class="d-flex flex-column justify-content-center align-items-center" style="font-weight: bold">
+                        <span>{{ $totalPosts }}</span>
+                        <span>Bài viết/Tháng</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-12 border">
+                <div class="d-flex justify-content-between align-items-center py-3">
+                    <span>
+                        <i class="ti ti-trekking" style="font-size: 30px; color: rgb(255, 94, 0)"></i>
+                    </span>
+                    <div class="d-flex flex-column justify-content-center align-items-center" style="font-weight: bold">
+                        <span>{{ $travelPlace }}</span>
+                        <span>Đặt chỗ/Tháng</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
-  <div class="col-lg-8 d-flex align-items-strech">
-    <div class="card w-100">
-      <div class="card-body">
-        <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
-          <div class="mb-3 mb-sm-0">
-            <h5 class="card-title fw-semibold">Sales Overview</h5>
-          </div>
-          <div>
-            <select class="form-select">
-              <option value="1">March 2023</option>
-              <option value="2">April 2023</option>
-              <option value="3">May 2023</option>
-              <option value="4">June 2023</option>
-            </select>
-          </div>
+        <div class="col-lg-8 d-flex align-items-strech">
+            <div class="card w-100">
+                <div class="card-body">
+                    <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                        <div class="mb-3 mb-sm-0">
+                            <h5 class="card-title fw-semibold">Doanh số bán hàng</h5>
+                        </div>
+                        <div>
+                            <select class="form-select" id="monthSelector">
+                            </select>
+                        </div>
+                    </div>
+                    <canvas id="revenueChart" width="400" height="200"></canvas>
+                </div>
+            </div>
         </div>
-        <div id="chart"></div>
-      </div>
+        <div class="col-lg-4">
+            <div class="row">
+                <div class="col-lg-12">
+                    <!-- Yearly Breakup -->
+                    <div class="card overflow-hidden">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-9 fw-semibold">Thu nhập năm</h5>
+                            <div class="row align-items-center">
+                                <div class="col-8">
+                                    <h4 class="fw-semibold mb-3">{{ number_format($totalAdvancePaymentCurrentYear) }}
+                                        <i class="ti ti-currency-dong fs-6"></i>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <!-- Monthly Earnings -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row alig n-items-start">
+                                <div class="col-8">
+                                    <h5 class="card-title mb-9 fw-semibold"> Thu thập hàng tháng</h5>
+                                    <h4 class="fw-semibold mb-3">{{ number_format($total_advance_payment_current_month) }}
+                                        <i class="ti ti-currency-dong fs-6"></i>
+                                    </h4>
+                                </div>
+                                <div class="col-4">
+                                    <div class="d-flex justify-content-end">
+                                        <div
+                                            class="text-white bg-warning rounded-circle p-6 d-flex align-items-center justify-content-center">
+                                            <i class="ti ti-currency-dong fs-6"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="earning" data-advance-payment-by-day="{{ json_encode($advance_payment_by_day) }}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="col-lg-4">
     <div class="row">
-      <div class="col-lg-12">
-        <!-- Yearly Breakup -->
-        <div class="card overflow-hidden">
-          <div class="card-body p-4">
-            <h5 class="card-title mb-9 fw-semibold">Yearly Breakup</h5>
-            <div class="row align-items-center">
-              <div class="col-8">
-                <h4 class="fw-semibold mb-3">$36,358</h4>
-                <div class="d-flex align-items-center mb-3">
-                  <span
-                    class="me-1 rounded-circle bg-light-success round-20 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-arrow-up-left text-success"></i>
-                  </span>
-                  <p class="text-dark me-1 fs-3 mb-0">+9%</p>
-                  <p class="fs-3 mb-0">last year</p>
+        <div class="col-lg-4 d-flex align-items-stretch">
+            <div class="card w-100">
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <h5 class="card-title fw-semibold">Giao dịch hôm nay</h5>
+                    </div>
+                    <ul class="timeline-widget mb-0 position-relative mb-n5">
+                        @foreach ($transactionsToday as $trans)
+                            <li class="timeline-item d-flex position-relative overflow-hidden">
+                                <div class="timeline-time text-dark flex-shrink-0 text-end">
+                                    {{ $trans->transaction_hour . ':' . $trans->transaction_minute }}
+                                </div>
+                                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
+                                    <span class="timeline-badge border-2 border border-primary flex-shrink-0 my-8"></span>
+                                    <span class="timeline-badge-border d-block flex-shrink-0"></span>
+                                </div>
+                                <div class="timeline-desc fs-3 text-dark mt-n1">Bạn có một giao dịch mới</div>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
-                <div class="d-flex align-items-center">
-                  <div class="me-4">
-                    <span class="round-8 bg-primary rounded-circle me-2 d-inline-block"></span>
-                    <span class="fs-2">2023</span>
-                  </div>
-                  <div>
-                    <span class="round-8 bg-light-primary rounded-circle me-2 d-inline-block"></span>
-                    <span class="fs-2">2023</span>
-                  </div>
+            </div>
+        </div>
+        <div class="col-lg-8 d-flex align-items-stretch">
+            <div class="card w-100">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-semibold mb-4">Giao dịch gần đây</h5>
+                    <div class="table-responsive">
+                        <table class="table text-nowrap mb-0 align-middle">
+                            <thead class="text-dark fs-4">
+                                <tr>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Id</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Tên người dùng</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Email</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Số điện thoại</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Quy</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Số tiền</h6>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($bookingList as $id => $data )
+                                <tr>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">{{$id + 1}}</h6>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-1">{{$data->full_name}}</h6>
+                                        <span class="fw-normal">{{$data->booker_email}}</span><br/>
+                                        <span class="fw-normal">{{$data->booker_phone}}</span>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                      <span class="fw-normal">{{$data->room_name}}</span>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-normal">{{$data->checkin_time}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-normal">{{$data->checkout_time}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0 fs-4">{{number_format($data->payment)}} đ</h6>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-              </div>
-              <div class="col-4">
-                <div class="d-flex justify-content-center">
-                  <div id="breakup"></div>
-                </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
-      <div class="col-lg-12">
-        <!-- Monthly Earnings -->
-        <div class="card">
-          <div class="card-body">
-            <div class="row alig n-items-start">
-              <div class="col-8">
-                <h5 class="card-title mb-9 fw-semibold"> Monthly Earnings </h5>
-                <h4 class="fw-semibold mb-3">$6,820</h4>
-                <div class="d-flex align-items-center pb-1">
-                  <span
-                    class="me-2 rounded-circle bg-light-danger round-20 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-arrow-down-right text-danger"></i>
-                  </span>
-                  <p class="text-dark me-1 fs-3 mb-0">+9%</p>
-                  <p class="fs-3 mb-0">last year</p>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="d-flex justify-content-end">
-                  <div
-                    class="text-white bg-secondary rounded-circle p-6 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-currency-dollar fs-6"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="earning"></div>
-        </div>
-      </div>
     </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-lg-4 d-flex align-items-stretch">
-    <div class="card w-100">
-      <div class="card-body p-4">
-        <div class="mb-4">
-          <h5 class="card-title fw-semibold">Recent Transactions</h5>
-        </div>
-        <ul class="timeline-widget mb-0 position-relative mb-n5">
-          <li class="timeline-item d-flex position-relative overflow-hidden">
-            <div class="timeline-time text-dark flex-shrink-0 text-end">09:30</div>
-            <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-              <span class="timeline-badge border-2 border border-primary flex-shrink-0 my-8"></span>
-              <span class="timeline-badge-border d-block flex-shrink-0"></span>
-            </div>
-            <div class="timeline-desc fs-3 text-dark mt-n1">Payment received from John Doe of $385.90</div>
-          </li>
-          <li class="timeline-item d-flex position-relative overflow-hidden">
-            <div class="timeline-time text-dark flex-shrink-0 text-end">10:00 am</div>
-            <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-              <span class="timeline-badge border-2 border border-info flex-shrink-0 my-8"></span>
-              <span class="timeline-badge-border d-block flex-shrink-0"></span>
-            </div>
-            <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New sale recorded <a
-                href="javascript:void(0)" class="text-primary d-block fw-normal">#ML-3467</a>
-            </div>
-          </li>
-          <li class="timeline-item d-flex position-relative overflow-hidden">
-            <div class="timeline-time text-dark flex-shrink-0 text-end">12:00 am</div>
-            <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-              <span class="timeline-badge border-2 border border-success flex-shrink-0 my-8"></span>
-              <span class="timeline-badge-border d-block flex-shrink-0"></span>
-            </div>
-            <div class="timeline-desc fs-3 text-dark mt-n1">Payment was made of $64.95 to Michael</div>
-          </li>
-          <li class="timeline-item d-flex position-relative overflow-hidden">
-            <div class="timeline-time text-dark flex-shrink-0 text-end">09:30 am</div>
-            <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-              <span class="timeline-badge border-2 border border-warning flex-shrink-0 my-8"></span>
-              <span class="timeline-badge-border d-block flex-shrink-0"></span>
-            </div>
-            <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New sale recorded <a
-                href="javascript:void(0)" class="text-primary d-block fw-normal">#ML-3467</a>
-            </div>
-          </li>
-          <li class="timeline-item d-flex position-relative overflow-hidden">
-            <div class="timeline-time text-dark flex-shrink-0 text-end">09:30 am</div>
-            <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-              <span class="timeline-badge border-2 border border-danger flex-shrink-0 my-8"></span>
-              <span class="timeline-badge-border d-block flex-shrink-0"></span>
-            </div>
-            <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New arrival recorded
-            </div>
-          </li>
-          <li class="timeline-item d-flex position-relative overflow-hidden">
-            <div class="timeline-time text-dark flex-shrink-0 text-end">12:00 am</div>
-            <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-              <span class="timeline-badge border-2 border border-success flex-shrink-0 my-8"></span>
-            </div>
-            <div class="timeline-desc fs-3 text-dark mt-n1">Payment Done</div>
-          </li>
-        </ul>
-      </div>
+    <div class="py-6 px-6 text-center">
+        <p class="mb-0 fs-4">Developed by Vicent Le</p>
     </div>
-  </div>
-  <div class="col-lg-8 d-flex align-items-stretch">
-    <div class="card w-100">
-      <div class="card-body p-4">
-        <h5 class="card-title fw-semibold mb-4">Recent Transactions</h5>
-        <div class="table-responsive">
-          <table class="table text-nowrap mb-0 align-middle">
-            <thead class="text-dark fs-4">
-              <tr>
-                <th class="border-bottom-0">
-                  <h6 class="fw-semibold mb-0">Id</h6>
-                </th>
-                <th class="border-bottom-0">
-                  <h6 class="fw-semibold mb-0">Assigned</h6>
-                </th>
-                <th class="border-bottom-0">
-                  <h6 class="fw-semibold mb-0">Name</h6>
-                </th>
-                <th class="border-bottom-0">
-                  <h6 class="fw-semibold mb-0">Priority</h6>
-                </th>
-                <th class="border-bottom-0">
-                  <h6 class="fw-semibold mb-0">Budget</h6>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="border-bottom-0"><h6 class="fw-semibold mb-0">1</h6></td>
-                <td class="border-bottom-0">
-                    <h6 class="fw-semibold mb-1">Sunil Joshi</h6>
-                    <span class="fw-normal">Web Designer</span>
-                </td>
-                <td class="border-bottom-0">
-                  <p class="mb-0 fw-normal">Elite Admin</p>
-                </td>
-                <td class="border-bottom-0">
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-3 fw-semibold">Low</span>
-                  </div>
-                </td>
-                <td class="border-bottom-0">
-                  <h6 class="fw-semibold mb-0 fs-4">$3.9</h6>
-                </td>
-              </tr>
-              <tr>
-                <td class="border-bottom-0"><h6 class="fw-semibold mb-0">2</h6></td>
-                <td class="border-bottom-0">
-                    <h6 class="fw-semibold mb-1">Andrew McDownland</h6>
-                    <span class="fw-normal">Project Manager</span>
-                </td>
-                <td class="border-bottom-0">
-                  <p class="mb-0 fw-normal">Real Homes WP Theme</p>
-                </td>
-                <td class="border-bottom-0">
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-secondary rounded-3 fw-semibold">Medium</span>
-                  </div>
-                </td>
-                <td class="border-bottom-0">
-                  <h6 class="fw-semibold mb-0 fs-4">$24.5k</h6>
-                </td>
-              </tr>
-              <tr>
-                <td class="border-bottom-0"><h6 class="fw-semibold mb-0">3</h6></td>
-                <td class="border-bottom-0">
-                    <h6 class="fw-semibold mb-1">Christopher Jamil</h6>
-                    <span class="fw-normal">Project Manager</span>
-                </td>
-                <td class="border-bottom-0">
-                  <p class="mb-0 fw-normal">MedicalPro WP Theme</p>
-                </td>
-                <td class="border-bottom-0">
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-danger rounded-3 fw-semibold">High</span>
-                  </div>
-                </td>
-                <td class="border-bottom-0">
-                  <h6 class="fw-semibold mb-0 fs-4">$12.8k</h6>
-                </td>
-              </tr>
-              <tr>
-                <td class="border-bottom-0"><h6 class="fw-semibold mb-0">4</h6></td>
-                <td class="border-bottom-0">
-                    <h6 class="fw-semibold mb-1">Nirav Joshi</h6>
-                    <span class="fw-normal">Frontend Engineer</span>
-                </td>
-                <td class="border-bottom-0">
-                  <p class="mb-0 fw-normal">Hosting Press HTML</p>
-                </td>
-                <td class="border-bottom-0">
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-success rounded-3 fw-semibold">Critical</span>
-                  </div>
-                </td>
-                <td class="border-bottom-0">
-                  <h6 class="fw-semibold mb-0 fs-4">$2.4k</h6>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-sm-6 col-xl-3">
-    <div class="card overflow-hidden rounded-2">
-      <div class="position-relative">
-        <a href="javascript:void(0)"><img src="../assets/images/products/s4.jpg" class="card-img-top rounded-0" alt="..."></a>
-        <a href="javascript:void(0)" class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i class="ti ti-basket fs-4"></i></a>                      </div>
-      <div class="card-body pt-3 p-4">
-        <h6 class="fw-semibold fs-4">Boat Headphone</h6>
-        <div class="d-flex align-items-center justify-content-between">
-          <h6 class="fw-semibold fs-4 mb-0">$50 <span class="ms-2 fw-normal text-muted fs-3"><del>$65</del></span></h6>
-          <ul class="list-unstyled d-flex align-items-center mb-0">
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card overflow-hidden rounded-2">
-      <div class="position-relative">
-        <a href="javascript:void(0)"><img src="../assets/images/products/s5.jpg" class="card-img-top rounded-0" alt="..."></a>
-        <a href="javascript:void(0)" class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i class="ti ti-basket fs-4"></i></a>                      </div>
-      <div class="card-body pt-3 p-4">
-        <h6 class="fw-semibold fs-4">MacBook Air Pro</h6>
-        <div class="d-flex align-items-center justify-content-between">
-          <h6 class="fw-semibold fs-4 mb-0">$650 <span class="ms-2 fw-normal text-muted fs-3"><del>$900</del></span></h6>
-          <ul class="list-unstyled d-flex align-items-center mb-0">
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card overflow-hidden rounded-2">
-      <div class="position-relative">
-        <a href="javascript:void(0)"><img src="../assets/images/products/s7.jpg" class="card-img-top rounded-0" alt="..."></a>
-        <a href="javascript:void(0)" class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i class="ti ti-basket fs-4"></i></a>                      </div>
-      <div class="card-body pt-3 p-4">
-        <h6 class="fw-semibold fs-4">Red Valvet Dress</h6>
-        <div class="d-flex align-items-center justify-content-between">
-          <h6 class="fw-semibold fs-4 mb-0">$150 <span class="ms-2 fw-normal text-muted fs-3"><del>$200</del></span></h6>
-          <ul class="list-unstyled d-flex align-items-center mb-0">
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card overflow-hidden rounded-2">
-      <div class="position-relative">
-        <a href="javascript:void(0)"><img src="../assets/images/products/s11.jpg" class="card-img-top rounded-0" alt="..."></a>
-        <a href="javascript:void(0)" class="bg-primary rounded-circle p-2 text-white d-inline-flex position-absolute bottom-0 end-0 mb-n3 me-3" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add To Cart"><i class="ti ti-basket fs-4"></i></a>                      </div>
-      <div class="card-body pt-3 p-4">
-        <h6 class="fw-semibold fs-4">Cute Soft Teddybear</h6>
-        <div class="d-flex align-items-center justify-content-between">
-          <h6 class="fw-semibold fs-4 mb-0">$285 <span class="ms-2 fw-normal text-muted fs-3"><del>$345</del></span></h6>
-          <ul class="list-unstyled d-flex align-items-center mb-0">
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="me-1" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-            <li><a class="" href="javascript:void(0)"><i class="ti ti-star text-warning"></i></a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="py-6 px-6 text-center">
-  <p class="mb-0 fs-4">Design and Developed by <a href="https://adminmart.com/" target="_blank" class="pe-1 text-primary text-decoration-underline">AdminMart.com</a> Distributed by <a href="https://themewagon.com">ThemeWagon</a></p>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var currentDate = new Date();
+            var currentYear = currentDate.getFullYear();
+            var currentMonth = currentDate.getMonth() + 1;
+            var currentDay = currentDate.getDay();
+            var monthNames = [
+                "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+                "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+            ];
+            var monthSelector = document.getElementById("monthSelector");
+            var chartDiv = document.getElementById("chart");
+            for (var i = 0; i < 12; i++) {
+                var option = document.createElement("option");
+
+                option.value = i + 1;
+                option.text = monthNames[i] + " - " + currentYear;
+                if (i + 1 === currentMonth) {
+                    option.selected = true;
+                }
+                monthSelector.appendChild(option);
+            }
+
+            var ctx = document.getElementById('revenueChart').getContext('2d');
+            var revenueChart;
+
+            monthSelector.addEventListener('change', function() {
+                loadChartData(this.value);
+            });
+
+            function loadChartData(selectedMonth) {
+                fetch('/get-revenue-data?month=' + selectedMonth)
+                    .then(response => response.json())
+                    .then(data => {
+                        drawChart(data);
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            function drawChart(data) {
+                if (revenueChart) {
+                    revenueChart.destroy();
+                }
+
+                revenueChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.dates,
+                        datasets: [{
+                            label: 'Doanh số',
+                            data: data.revenue,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            loadChartData(currentMonth);
+        });
+    </script>
 @endsection

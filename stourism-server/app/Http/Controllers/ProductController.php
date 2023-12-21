@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use function Ramsey\Uuid\Generator\timestamp;
 
 class ProductController extends Controller
 {
@@ -70,7 +71,7 @@ class ProductController extends Controller
 
             $data = [
                 'product_name' => $request->product_name,
-                'product_slug' => Str::slug($request->product_name),
+                'product_slug' => Str::slug($request->product_name) . '-' . time(),
                 'product_address' => $request->product_address,
                 'product_phone' => $request->product_phone,
                 'product_email' => $request->product_email,
@@ -100,12 +101,19 @@ class ProductController extends Controller
         $categories = DB::table('categories')->get();
         $business = DB::table('business')->get();
         $categories_product = DB::table('categories_product')->where('product_id', $product->id)->get();
-        return view('product.edit', compact('product', 'categories', 'business', 'categories_product'));
+        return view('product.edit', compact('product','categories', 'business', 'categories_product'));
+    }
+
+    public function productDetail($product_slug){
+        $product = DB::table('products')->where('product_slug', $product_slug)->first();
+        $categories = DB::table('categories')->get();
+        $business = DB::table('business')->get();
+        $categories_product = DB::table('categories_product')->where('product_id', $product->id)->get();
+        return view('product.detail', compact('product','categories', 'business', 'categories_product'));
     }
 
     public function productUpdate(ProductEditRequest $request, $product_slug){
         $product = DB::table('products')->where('product_slug', $product_slug)->first();
-        $product_slug_new = Str::slug($request->product_name);
         $imageName = null;
         if ($request->hasFile('product_main_image') && $request->file('product_main_image')->isValid()) {
             $image = $request->file('product_main_image');
@@ -128,7 +136,7 @@ class ProductController extends Controller
 
         $data = [
             'product_name' => $request->product_name,
-            'product_slug' => Str::slug($request->product_name),
+            'product_slug' => Str::slug($request->product_name) . '-' . time(),
             'product_address' => $request->product_address,
             'product_phone' => $request->product_phone,
             'product_email' => $request->product_email,
@@ -153,9 +161,9 @@ class ProductController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    public function productDestroy($product_slug)
+    public function productDestroy($id)
     {
-        $product = DB::table('products')->where('product_slug', $product_slug)->first();
+        $product = DB::table('products')->where('id', $id)->first();
         if ($product) {
             $imagePath = public_path('images/' . $product->product_main_image);
             if (File::exists($imagePath)) {
@@ -172,7 +180,7 @@ class ProductController extends Controller
                 }
             }
 
-            DB::table('products')->where('product_slug', $product_slug)->delete();
+            DB::table('products')->where('id', $id)->delete();
             return response()->json([
                 'status' => 'success',
                 'message' => 'Xóa sản phẩm thành công.'

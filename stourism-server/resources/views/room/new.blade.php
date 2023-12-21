@@ -79,16 +79,27 @@
                     type: 'POST',
                     url: '/admin/phong/them-moi',
                     data: formData,
-                    processData: false,  // Không xử lý dữ liệu
-                    contentType: false,  // Không đặt kiểu dữ liệu
+                    processData: false,
+                    contentType: false,
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                         'Accept': 'application/json'
                     },
                     success: function (response) {
                         if (response.status === 'success') {
-                            window.location.href = '/admin/phong';
+                            window.location.href = '/admin/phong?create-success';
                         } else {
+                            showToast('Có lỗi trong quá trình thêm mới phòng. Vui lòng thử lại.', 'error');
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            var errors = xhr.responseJSON.errors;
+                            $.each(errors, function (key, value) {
+                                showToast(value, 'error');
+                            });
+                        } else {
+                            console.log(xhr)
                             alert('Có lỗi trong quá trình thêm mới danh mục. Vui lòng thử lại.');
                         }
                     }

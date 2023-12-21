@@ -26,22 +26,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/v2/booking/{bookingId}', [\App\Http\Controllers\BookingController::class, 'bookingById']);
     Route::post('/v2/rating', [\App\Http\Controllers\RatingController::class, 'createRating']);
     Route::get('/v2/rating/{bookingId}', [\App\Http\Controllers\RatingController::class, 'getRatingWithBookingIf']);
+    Route::post('/v2/post', [\App\Http\Controllers\PostController::class, 'post']);
 });
-Route::post('/v2/login', [AuthController::class, 'login'])->name('login');
-Route::post('/v2/register', [AuthController::class, 'register'])->name('registerPost');
-Route::post('/v2/confirm-email', [AuthController::class, 'confirmEmail'])->name('confirmEmail');
-Route::post('/v2/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgotPassword');
+Route::post('/v2/login', [AuthController::class, 'login']);
+Route::post('/v2/register', [AuthController::class, 'register']);
+Route::post('/v2/confirm-email', [AuthController::class, 'confirmEmail']);
+Route::post('/v2/forgot-password', [AuthController::class, 'forgotPassword']);
 
 
 Route::get('/v2/{slug}/categories', [CategoryController::class, 'getCategory']);
 Route::get('/v2/categories', [CategoryController::class, 'getCategoryList']);
 
 Route::get('/v2/{slug}/products', [ProductController::class, 'getProduct']);
-Route::get('/v2/products/food', [ProductController::class, 'getFoodProductList']);
+Route::get('/v2/products', [ProductController::class, 'getProductList']);
 Route::get('/v2/products/hotel', [ProductController::class, 'getHotelProductList']);
 Route::post('/v2/rooms/search', [ProductController::class, 'searchRoom']);
 Route::get('/v2/{slug}/rooms', [RoomController::class, 'getRoom']);
 Route::get('/v2/rooms', [RoomController::class, 'getRoomList']);
 Route::get('/v2/product/{id}/rooms', [RoomController::class, 'getProductRooms']);
 Route::get('/v2/provice', [LocationController::class, 'getProvinceList']);
-
+Route::get('/v2/post/{id}', [\App\Http\Controllers\PostController::class, 'getPost']);
+Route::get('/v2/post', [\App\Http\Controllers\PostController::class, 'index']);

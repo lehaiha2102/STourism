@@ -32,7 +32,7 @@
                                     <label for="exampleInputEmail1">Email address</label>
                                     <input type="email" name="email" class="form-control mb-0" id="exampleInputEmail1" placeholder="Enter email">
                                 </div>
-                                <a href="{{ route('loginView') }}" type="button" class="btn btn-secondary w-100 py-8 fs-4 mb-4 rounded-2">Hủy</a>
+                                <a href="{{ route('admin.loginView') }}" type="button" class="btn btn-secondary w-100 py-8 fs-4 mb-4 rounded-2">Hủy</a>
                                 <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Xác nhận</button>
                             </form>
                         </div>

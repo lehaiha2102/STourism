@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\BusinessCreateRequest;
+use App\Http\Requests\BusinessUpdateRequest;
 
 class BusinessController extends Controller
 {
@@ -24,7 +26,7 @@ class BusinessController extends Controller
         return view('business.new', compact('users'));
     }
 
-    public function newBusinessPost(Request $request){
+    public function newBusinessPost(BusinessCreateRequest $request){
         $validator = Validator::make($request->all(), [
             'business_name' => 'required|string|max:255',
             'business_slug' => 'string|max:255|unique:business',
@@ -98,10 +100,9 @@ class BusinessController extends Controller
         return view('business.edit', compact('business', 'users'));
     }
 
-    public function businessUpdate(Request $request, $business_slug)
+    public function businessUpdate(BusinessUpdateRequest $request, $business_slug)
     {
         $business = DB::table('business')->where('business_slug', $business_slug)->first();
-
         if ($business) {
             $business_slug = Str::slug($request->business_name);
 
@@ -137,15 +138,15 @@ class BusinessController extends Controller
                 'business_banner' => $bannerName,
             ];
 
-            DB::table('business')->where('business_slug', $business_slug)->update($data);
+            DB::table('business')->where('business_slug', $business->business_slug)->update($data);
             return response()->json(['status' => 'success']);
         }
     }
 
 
-    public function businessDestroy($business_slug)
+    public function businessDestroy($id)
     {
-        $business = DB::table('business')->where('business_slug', $business_slug)->first();
+        $business = DB::table('business')->where('id', $id)->first();
         if ($business && $business->business_logo && $business->business_banner) {
             $imagePath = public_path('images/' . $business->business_logo);
             $bannerPath = public_path('images/' . $business->business_banner);
@@ -159,7 +160,7 @@ class BusinessController extends Controller
             }
         }
 
-        DB::table('business')->where('business_slug', $business_slug)->delete();
+        DB::table('business')->where('id', $id)->delete();
         return response()->json([
             'status' => 'success',
             'message' => 'Xóa danh mục thành công.'

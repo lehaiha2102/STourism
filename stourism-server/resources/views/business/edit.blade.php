@@ -116,7 +116,18 @@
                     },
                     success: function (response) {
                         if (response.status === 'success') {
-                            window.location.href = '/admin/doanh-nghiep';
+                            window.location.href = '/admin/doanh-nghiep?update-success';
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            var errors = xhr.responseJSON.errors;
+                            $.each(errors, function (key, value) {
+                                showToast(value, 'error');
+                            });
+                        } else {
+                            console.log(xhr)
+                            alert('Có lỗi trong quá trình cập nhật danh mục. Vui lòng thử lại.');
                         }
                     }
                 });

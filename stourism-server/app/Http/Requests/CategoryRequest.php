@@ -24,7 +24,7 @@ class CategoryRequest extends FormRequest
     public function rules()
     {
         return [
-            'category_name' => 'required|string|max:255',
+            'category_name' => 'required|string|max:255|regex:/^[a-zA-Z0-9\s]+$/|unique:categories,category_name',
             'category_image' => 'required|image|mimes:jpeg,png|max:2048',
             'category_banner' => 'required|image|mimes:jpeg,png|max:2048',
             'category_status' => 'required|boolean',
@@ -59,6 +59,8 @@ class CategoryRequest extends FormRequest
             'category_name.required' => 'Tên danh mục là bắt buộc.',
             'category_name.string' => 'Tên danh mục phải là một chuỗi.',
             'category_name.max' => 'Tên danh mục không được vượt quá :max ký tự.',
+            'category_name.regex' => 'Tên danh mục không được chứa ký tự đặc biệt.',
+            'category_name.unique' => 'Tên danh mục đã tồn tại.',
 
             'category_image.required' => 'Ảnh danh mục là bắt buộc.',
             'category_image.image' => 'Trường này chỉ chấp nhận file hình ảnh.',

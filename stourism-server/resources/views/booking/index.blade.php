@@ -16,7 +16,10 @@
                                     <h6 class="fw-semibold mb-0">Id</h6>
                                 </th>
                                 <th class="border-bottom-0">
-                                    <h6 class="fw-semibold mb-0">Người book</h6>
+                                    <h6 class="fw-semibold mb-0">Người đặt</h6>
+                                </th>
+                                <th class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">Phòng</h6>
                                 </th>
                                 <th class="border-bottom-0">
                                     <h6 class="fw-semibold mb-0">Thời gian nhận phòng</h6>
@@ -25,13 +28,10 @@
                                     <h6 class="fw-semibold mb-0">Thời gian trả phòng</h6>
                                 </th>
                                 <th class="border-bottom-0">
-                                    <h6 class="fw-semibold mb-0">Xử lý</h6>
+                                    <h6 class="fw-semibold mb-0">Số tiền thanh toán</h6>
                                 </th>
                                 <th class="border-bottom-0">
-                                    <h6 class="fw-semibold mb-0 d-flex align-items-center justify-content-center">Thanh toán tiền cọc</h6>
-                                </th>
-                                <th class="border-bottom-0">
-                                    {{-- some thing --}}
+                                    <h6 class="fw-semibold mb-0">Trạng thái thanh toán</h6>
                                 </th>
                             </tr>
                             </thead>
@@ -40,7 +40,10 @@
                                 <tr>
                                     <td class="border-bottom-0"><h6 class="fw-semibold mb-0">{{ $index + 1 }}</h6></td>
                                     <td class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-1">{{ $b->booker }}</h6>
+                                        <h6 class="fw-semibold mb-1">{{ $b->full_name }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-1">{{ $b->room_name }}</h6>
                                     </td>
                                     <td class="border-bottom-0">
                                         <h6 class="fw-semibold mb-1">{{ $b->checkin_time }}</h6>
@@ -49,19 +52,13 @@
                                         <h6 class="fw-semibold mb-1">{{ $b->checkout_time }}</h6>
                                     </td>
                                     <td class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-1">{{ $b->booking_status }}</h6>
+                                        <h6 class="fw-semibold mb-1">{{ number_format($b->payment) }}</h6>
                                     </td>
                                     <td class="border-bottom-0 status-toggle" data-booking-id="{{ $b->id }}" data-status="{{ $b->booking_status }}" >
-                                        {!! $b->booking_status == 1 ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Còn hoạt động</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Tạm ngừng hoạt động</span>' !!}
+                                        {!! $b->payment_check == 1 ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Đã thanh toán</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Chưa thanh toán</span>' !!}
                                     </td>
-                                    <td class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-1">{{ $b->advance_payment_check }}</h6>
-                                    </td>
-                                    <td class="border-bottom-0">
-                                        <a class="btn btn-outline-warning m-1" href="{{ route('booking.edit', ['bookingId' => $b->id])  }}">Chỉnh sửa</a>
-                                        <button type="button" class="btn btn-outline-danger m-1" data-id="{{$b->id}}" data-toggle="modal" data-target="#exampleModal{{$b->id}}">
-                                            <i class="pe-7s-trash"></i>
-                                        </button>
+                                    <td class="border-bottom-0 status-toggle" data-booking-id="{{ $b->id }}" data-status="{{ $b->booking_status }}" >
+                                        {!! $b->booking_status === 'success' ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Đã hoàn thành</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Chưa hoàn thành</span>' !!}
                                     </td>
                                 </tr>
                             @endforeach
@@ -91,59 +88,4 @@
         </div>
     @endforeach
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.status-toggle').click(function() {
-                var booking_id = $(this).data('booking-id');
-                var current_status = $(this).data('status');
-                var new_status = current_status == 1 ? 0 : 1;
-
-                $.ajax({
-                    url: '{{ route("booking.change-status") }}',
-                    type: 'POST',
-                    data: {
-                        'bookingId': booking_id,
-                        'status': new_status
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                        'Accept': 'application/json'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            var newStatusHtml = new_status == 1 ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Còn hoạt động</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Tạm ngừng hoạt động</span>';
-                            $('.status-toggle[data-booking-id="' + booking_id + '"]').data('status', new_status);
-                            $('.status-toggle[data-booking-id="' + booking_id + '"]').html(newStatusHtml);
-                            alert(response.message);
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                });
-            });
-        });
-    </script>
-    <script>
-        $(document).ready(function () {
-            $('#delete-booking').on('submit', function (e) {
-                e.preventDefault();
-                var bookingSlug = $('#id_delete').val();
-
-                $.ajax({
-                    type: 'DELETE',
-                    url: '/admin/dat-cho/'+ bookingSlug +'/xoa',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                        'Accept': 'application/json'
-                    },
-                    success: function (response) {
-                        if(response.status === 'success'){
-                            alert('xóa thành công');
-                            window.location.href = '/admin/dat-cho';
-                        }
-                    }
-                });
-            });
-        });
-    </script>
 @endsection
