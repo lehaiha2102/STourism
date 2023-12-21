@@ -40,7 +40,7 @@ class ProductController extends Controller
                 ->get();
             return view('product.index', compact('products', 'business', 'categories_product'));
         } else {
-            return redirect('/loginView');
+            return redirect('/admin/login');
         }
     }
 

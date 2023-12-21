@@ -28,7 +28,7 @@ class RatingController extends Controller
             }
             return view('rating.index', compact('rating' ));
         } else {
-            return redirect('/loginView');
+            return redirect('/admin/login');
         }
     }
 

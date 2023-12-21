@@ -31,6 +31,9 @@ Route::get('/admin/reset-password', [AuthController::class, 'resetPasswordView']
 Route::post('/admin/reset-password', [AuthController::class, 'resetPassword'])->name('admin.resetPassword');
 Route::group(['middleware' => ['CheckLoginServer']], function () {
     Route::get('/admin', [AuthController::class, 'index'])->name('dashboard');
+    Route::get('/admin/quan-ly-tai-khoan', [AuthController::class, 'profile'])->name('profile');
+    Route::put('/profile/cap-nhat-tai-khoan', [AuthController::class, 'updateProfile'])->name('profile.update');
+
     Route::get('/get-revenue-data', [AuthController::class, 'getRevenueData']);
     Route::get('/admin/danh-muc', [CategoryController::class, 'index'])->name('category');
     Route::get('/admin/danh-muc/them-moi', [CategoryController::class, 'newCategory'])->name('category.new');

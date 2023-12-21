@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Session;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ProfileUpdateRequest;
 use Carbon\Carbon;
 
 
@@ -26,20 +27,20 @@ class AuthController extends Controller
         $firstDayOfMonth = Carbon::now()->firstOfMonth()->toDateString();
         $lastDayOfMonth = Carbon::now()->lastOfMonth()->toDateString();
         $totalPosts = DB::table('post')
-        ->whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
-        ->count();
+            ->whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
+            ->count();
         $totalBookings = DB::table('booking')
-        ->whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
-        ->count();
+            ->whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
+            ->count();
 
         $currentMonth = date('Y-m');
         $lastMonth = date('Y-m', strtotime('-1 month', strtotime($currentMonth)));
 
         $bookings = DB::table('booking')
-        ->selectRaw('DATE_FORMAT(checkin_time, "%Y-%m-01") as date, SUM(payment) as total_advance_payment')
-        ->whereBetween('checkout_time', ["{$currentMonth}-01 00:00:00", "{$currentMonth}-31 23:59:59"])
-        ->groupBy('date')
-        ->get();
+            ->selectRaw('DATE_FORMAT(checkin_time, "%Y-%m-01") as date, SUM(payment) as total_advance_payment')
+            ->whereBetween('checkout_time', ["{$currentMonth}-01 00:00:00", "{$currentMonth}-31 23:59:59"])
+            ->groupBy('date')
+            ->get();
 
         $currentYear = date('Y');
         $lastYear = date('Y', strtotime('-1 year', strtotime($currentYear)));
@@ -66,15 +67,15 @@ class AuthController extends Controller
         $currentDate = now()->toDateString();
 
         $transactionsToday = DB::table('booking')
-        ->whereDate('created_at', now()->toDateString())
-        ->selectRaw('hour(created_at) as transaction_hour, minute(created_at) as transaction_minute')
-        ->get();
+            ->whereDate('created_at', now()->toDateString())
+            ->selectRaw('hour(created_at) as transaction_hour, minute(created_at) as transaction_minute')
+            ->get();
 
         $bookingList = DB::table('booking')
-        ->join('users', 'booking.booker', '=', 'users.id')
-        ->join('rooms', 'booking.room_id', '=', 'rooms.id')
-        ->select('booking.*', 'users.full_name', 'rooms.room_name')
-        ->paginate(20);
+            ->join('users', 'booking.booker', '=', 'users.id')
+            ->join('rooms', 'booking.room_id', '=', 'rooms.id')
+            ->select('booking.*', 'users.full_name', 'rooms.room_name')
+            ->paginate(20);
 
         return view('index', compact('totalUsers',
                                         'totalBusiness',
@@ -271,9 +272,15 @@ class AuthController extends Controller
         }
     }
 
+    public function profile(){
+        $userId =session('user')->id;
+        $user = DB::table('users')->where('id', $userId)->first();
+        return view('profile', compact('user'));
+    }
+
     public function logout(){
         Session::flush();
-        return redirect()->route('loginView');
+        return redirect()->route('admin.loginView');
     }
 
     public function forgotPasswordView(){
@@ -315,6 +322,25 @@ class AuthController extends Controller
                 'status' => 'success',
             ]);
         }
+    }
+
+    public function updateProfile(ProfileUpdateRequest $request)
+    {
+        $userId = session('user')->id;
+
+    // Sử dụng Query Builder để cập nhật dữ liệu trong database
+        DB::table('users')
+            ->where('id', $userId)
+            ->update($request->only(['dob', 'address']));
+
+        if ($request->has('phone')) {
+            // Kiểm tra và cập nhật số điện thoại nếu có
+            DB::table('users')
+                ->where('id', $userId)
+                ->update(['phone' => $request->input('phone')]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Cập nhật thông tin thành công']);
     }
 
     public function resetPasswordView(){

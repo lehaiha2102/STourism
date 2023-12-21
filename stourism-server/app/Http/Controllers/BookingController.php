@@ -27,11 +27,11 @@ class BookingController extends Controller
                     ->join('products', 'rooms.product_id', '=', 'products.id')
                     ->join('business', 'products.business_id', '=', 'business.id')
                     ->join('users as business_user', 'business.user_id', '=', 'business_user.id')
-                    ->select('booking.*', 'booker_user.full_name as booker_name', 'rooms.room_name')
+                    ->select('booking.*', 'booker_user.full_name', 'rooms.room_name')
                     ->where('business_user.id', '=', $user)
                     ->paginate(30);
             }
-            return view('post.index', compact('booking'));
+            return view('booking.index', compact('booking'));
         }
     }
     public function newBooking(){
