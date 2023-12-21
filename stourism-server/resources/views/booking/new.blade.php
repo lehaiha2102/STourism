@@ -29,14 +29,6 @@
                                 <select id="disabledSelect" name="booking_status" class="form-select">
                                     <option value="confirmed">Đã xác nhận</option>
                                     <option value="unconfirmed">Chưa xác nhận</option>
-                                    <option value="cancelled">Hủy</option>
-                                    <option value="completed">Hoàn thành</option>
-                                    <option value="unpaid">Chưa thanh toán</option>
-                                    <option value="paid">Đã thanh toán</option>
-                                    <option value="in_use">Sử dụng</option>
-                                    <option value="overdue">Quá hạn</option>
-                                    <option value="pending_confirmation">Chờ xác nhận</option>
-                                    <option value="rejected">Từ chối</option>
                                 </select>
                             </div>                            
                             <div class="mb-3">

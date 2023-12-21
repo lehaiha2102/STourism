@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\PasswordUpdateRequest;
 use Carbon\Carbon;
 
 
@@ -327,22 +328,34 @@ class AuthController extends Controller
     public function updateProfile(ProfileUpdateRequest $request)
     {
         $userId = session('user')->id;
-
-    // Sử dụng Query Builder để cập nhật dữ liệu trong database
-        DB::table('users')
-            ->where('id', $userId)
-            ->update($request->only(['dob', 'address']));
-
-        if ($request->has('phone')) {
-            // Kiểm tra và cập nhật số điện thoại nếu có
-            DB::table('users')
-                ->where('id', $userId)
-                ->update(['phone' => $request->input('phone')]);
+        $imageName = null;
+        $bannerName = null;
+    
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            $image = $request->file('avatar');
+            $imageName = 'image-' . time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
         }
-
+    
+        if ($request->hasFile('banner') && $request->file('banner')->isValid()) {
+            $image = $request->file('banner');
+            $bannerName = 'banner-' . time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $bannerName);
+        }
+    
+        $dataToUpdate = [
+            'dob' => $request->input('dob'),
+            'address' => $request->input('address'),
+            'phone' => $request->has('phone') ? $request->input('phone') : null,
+            'avatar' => $imageName,
+            'banner' => $bannerName,
+        ];
+    
+        DB::table('users')->where('id', $userId)->update($dataToUpdate);
+    
         return response()->json(['success' => true, 'message' => 'Cập nhật thông tin thành công']);
-    }
-
+    }    
+    
     public function resetPasswordView(){
         if (session()->has('user')) {
             return redirect()->route('dashboard');
@@ -380,4 +393,31 @@ class AuthController extends Controller
             }
         }
     }
+
+    public function updatePassword(PasswordUpdateRequest $request)
+{
+    // Lấy dữ liệu từ request
+    $userId = session('user')->id;
+    $oldPassword = $request->input('old_password');
+    $newPassword = $request->input('password');
+    $repeatedPassword = $request->input('repassword');
+
+    // Kiểm tra mật khẩu cũ
+    $user = DB::table('users')->find($userId);
+
+    if (!Hash::check($oldPassword, $user->password)) {
+        return response()->json(['error' => ['Mật khẩu cũ không đúng']], 422);
+    }
+
+    // Kiểm tra mật khẩu mới và mật khẩu nhập lại
+    if ($newPassword !== $repeatedPassword) {
+        return response()->json(['error' => ['Mật khẩu mới không khớp']], 422);
+    }
+
+    // Cập nhật mật khẩu mới
+    DB::table('users')->where('id', $userId)->update(['password' => Hash::make($newPassword)]);
+
+    return response()->json(['success' => true, 'message' => ['Cập nhật mật khẩu thành công']]);
+}
+
 }

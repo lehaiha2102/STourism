@@ -30,14 +30,6 @@
                                 <select id="disabledSelect" name="booking_status" value="{{ $b->booking_status}}" class="form-select">
                                     <option value="confirmed" {{ $b->booking_status == 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
                                     <option value="unconfirmed" {{ $b->booking_status == 'unconfirmed' ? 'selected' : '' }}>Chưa xác nhận</option>
-                                    <option value="cancelled" {{ $b->booking_status == 'cancelled' ? 'selected' : '' }}>Hủy</option>
-                                    <option value="completed" {{ $b->booking_status == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
-                                    <option value="unpaid" {{ $b->booking_status == 'unpaid' ? 'selected' : '' }}>Chưa thanh toán</option>
-                                    <option value="paid" {{ $b->booking_status == 'paid' ? 'selected' : '' }}>Đã thanh toán</option>
-                                    <option value="in_use" {{ $b->booking_status == 'in_use' ? 'selected' : '' }}>Sử dụng</option>
-                                    <option value="overdue" {{ $b->booking_status == 'overdue' ? 'selected' : '' }}>Quá hạn</option>
-                                    <option value="pending_confirmation" {{ $b->booking_status == 'pending_confirmation' ? 'selected' : '' }}>Chờ xác nhận</option>
-                                    <option value="rejected" {{ $b->booking_status == 'rejected' ? 'selected' : '' }}>Từ chối</option>
                                 </select>
                             </div>
                             
