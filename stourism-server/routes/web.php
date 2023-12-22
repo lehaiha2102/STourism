@@ -80,8 +80,9 @@ Route::group(['middleware' => ['CheckLoginServer']], function () {
 
     Route::get('/admin/bai-viet', [\App\Http\Controllers\PostController::class, 'postAdmin'])->name('postAdmin');
     Route::get('/admin/bai-viet/them-moi', [\App\Http\Controllers\PostController::class, 'newPost'])->name('Post.new');
-    Route::post('/admin/bai-viet/them-moi', [\App\Http\Controllers\PostController::class, 'newPostPost'])->name('Post.post');
-    Route::get('/admin/bai-viet/{Post_slug}/chinh-sua', [\App\Http\Controllers\PostController::class, 'PostEdit'])->name('Post.edit');
+    Route::post('/admin/bai-viet/them-moi', [\App\Http\Controllers\PostController::class, 'adminPost'])->name('Post.post');
+    Route::get('/admin/bai-viet/{id}/chinh-sua', [\App\Http\Controllers\PostController::class, 'postEdit'])->name('post.edit');
+    Route::get('/admin/bai-viet/{id}/chi-tiet', [\App\Http\Controllers\PostController::class, 'postDetail'])->name('post.detail');
     Route::post('/admin/bai-viet/{Post_slug}/cap-nhat', [\App\Http\Controllers\PostController::class, 'PostUpdate'])->name('Post.patch');
     Route::delete('/admin/bai-viet/{Post_slug}/xoa', [\App\Http\Controllers\PostController::class, 'PostDestroy'])->name('Post.destroy');
     Route::post('/admin/bai-viet/cap-nhat-trang-thai', [\App\Http\Controllers\PostController::class, 'PostStatus'])->name('Post.change-status');

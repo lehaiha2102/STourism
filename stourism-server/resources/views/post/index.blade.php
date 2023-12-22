@@ -9,7 +9,7 @@
                         <a href="{{ route('Post.new')  }}" class="btn btn-outline-success m-1 mb-4">Thêm mới</a>
                     </div>
                     <div class="table-responsive">
-                        <table class="table text-nowrap mb-0 align-middle">
+                        <table class="table text-nowrap mb-0 align-middle" id="example1">
                             <thead class="text-dark fs-4">
                             <tr>
                                 <th class="border-bottom-0">
@@ -41,7 +41,9 @@
                             <tbody>
                             @foreach($posts as $index => $post)
                                 <tr>
-                                    <td class="border-bottom-0"><h6 class="fw-semibold mb-0">{{ $index + 1 }}</h6></td>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">{{ $index + 1 }}</h6>
+                                    </td>
                                     <td class="border-bottom-0">
                                         <h6 class="fw-semibold mb-1">{{ $post->title }}</h6>
                                     </td>
@@ -60,6 +62,16 @@
                                     <td class="border-bottom-0">
                                         <h6 class="fw-semibold mb-1">{{ $post->updated_at }}</h6>
                                     </td>
+                                    <td class="border-bottom-0">
+                                        <a class="btn btn-outline-success m-1"
+                                                href="{{ route('post.detail', ['id' => $post->id]) }}">Xem</a>
+                                        <a class="btn btn-outline-warning m-1" href="{{ route('post.edit', ['id' => $post->id])  }}">Chỉnh sửa</a>
+                                        <button type="button" class="btn btn-outline-danger m-1"
+                                                data-id="{{ $post->id }}" data-toggle="modal"
+                                                data-target="#exampleModal{{ $post->id }}">
+                                                Xóa
+                                            </button>
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -74,7 +86,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Xóa danh mục</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Xóa bài viết</h5>
                     </div>
                     <div class="modal-body">
                         <p class="mb-0">Bạn có chắc chắn muốn xóa <span style="color:red">{{$post->title}}</span>?</p>
@@ -88,6 +100,24 @@
         </div>
     @endforeach
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+            $('#example1').DataTable();
+    </script>
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('update-success')) {
+            // Hiển thị toast
+            showToast('Cập nhật bài viết thành công', 'success');
+            history.replaceState({}, document.title, window.location.pathname);
+        } else if (urlParams.has('create-success')) {
+            // Hiển thị toast
+            showToast('Thêm mới bài viết thành công', 'success');
+            history.replaceState({}, document.title, window.location.pathname);
+        }
+    </script>
     <script>
         $(document).ready(function () {
             $('#delete-post').on('submit', function (e) {

@@ -9,7 +9,7 @@
                         <a href="{{ route('room.new') }}" class="btn btn-outline-success m-1 mb-4">Thêm mới</a>
                     </div>
                     <div class="table-responsive">
-                        <table class="table text-nowrap mb-0 align-middle">
+                        <table class="table text-nowrap mb-0 align-middle" id="example1">
                             <thead class="text-dark fs-4">
                                 <tr>
                                     <th class="border-bottom-0">
@@ -85,6 +85,12 @@
         </div>
     @endforeach
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+            $('#example1').DataTable();
+    </script>
     <script>
         function showToast(message, type = 'success') {
             Toastify({

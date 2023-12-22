@@ -20,6 +20,7 @@ class BookingController extends Controller
                     ->join('rooms', 'booking.room_id', '=', 'rooms.id')
                     ->select('booking.*', 'users.full_name', 'rooms.room_name')
                     ->paginate(50);
+                    return view('booking.index', compact('booking'));
             } else if($role_id == 2) {
                 $booking = DB::table('booking')
                     ->join('users as booker_user', 'booking.booker', '=', 'booker_user.id')
@@ -30,8 +31,8 @@ class BookingController extends Controller
                     ->select('booking.*', 'booker_user.full_name', 'rooms.room_name')
                     ->where('business_user.id', '=', $user)
                     ->paginate(30);
+                    return view('booking.index', compact('booking'));
             }
-            return view('booking.index', compact('booking'));
         }
     }
     public function newBooking(){
@@ -235,4 +236,19 @@ class BookingController extends Controller
             ->get();
         return response()->json(['data' => $booking], 200);
     }
+
+    // public function monthly_revenue(){
+    //     $startDate = Carbon::now()->startOfMonth()->toDateString();
+    //     $endDate = Carbon::now()->endOfMonth()->toDateString();
+    //     $revenue = DB::table('booking')
+    //         ->join('rooms', 'booking.room_id', '=', 'rooms.id')
+    //         ->join('products', 'rooms.product_id', '=', 'products.id')
+    //         ->join('business', 'product.business_id', '=', 'business.id')
+    //         ->where('booking.checkout_time', '>=', $startDate)
+    //         ->where('booking.checkout_time', '<=', $endDate)
+    //         ->where('booking.booking_status', 'completed')
+    //         ->where('booking.payment_check', 1)
+    //         ->sum(DB::raw('booking.payment * 0.85'));
+    //         ->paginate(30);
+    // }
 }

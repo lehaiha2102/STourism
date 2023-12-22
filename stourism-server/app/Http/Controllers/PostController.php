@@ -73,8 +73,43 @@ class PostController extends Controller
     
         return response()->json(['status' => 'success']);
     }
+
+    public function adminPost(Request $request){
+        $userId = session('user')->id;
+        $imageNames = [];
+    
+        if ($request->hasFile('post_images')) {
+            foreach ($request->file('post_images') as $index => $image) {
+                if ($image->isValid()) {
+                    $imageName = 'post_image-' . time() . $index . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images'), $imageName);
+                    $imageNames[] = $imageName;
+                }
+            }
+        }
+    
+        $post = DB::table('post')->insert([
+            'user' => $userId,
+            'title' => $request->title,
+            'target' => $request->target,
+            'description' => $request->description,
+            'content' => $request->content,
+            'images' => json_encode($imageNames),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    
+        return response()->json(['status' => 'success']);
+    }
     
     public function newPost(){
-        return view('post.new');
+        $products = DB::table('products')->get();
+        return view('post.new', compact('products'));
+    }
+
+    public function postEdit($id){
+        $post = DB::table('post')->where('id', $id)->first();
+        $products = DB::table('products')->get();
+        return view('post.edit', compact('post', 'products'));
     }
 }

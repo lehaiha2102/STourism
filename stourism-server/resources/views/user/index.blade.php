@@ -9,7 +9,7 @@
                         <a href="" class="btn btn-outline-success m-1 mb-4">Thêm mới</a>
                     </div>
                     <div class="table-responsive">
-                        <table class="table text-nowrap mb-0 align-middle">
+                        <table class="table text-nowrap mb-0 align-middle" id="example1"  style="width:100%">
                             <thead class="text-dark fs-4">
                                 <tr>
                                     <th class="border-bottom-0">
@@ -60,7 +60,7 @@
                                             <h6 class="fw-semibold mb-1">
                                                 {{ $data->role_name ? $data->role_name : 'Chưa cập nhật phân quyền' }}</h6>
                                         </td>
-                                        <td class="border-bottom-0 d-flex align-items-center">
+                                        <td class="border-bottom-0">
                                             @if ($data->role_name !== 'admin')
                                                 <a href="#" class="toggle-banner text-white"
                                                     data-user-id="{{ $data->id }}">
@@ -79,6 +79,12 @@
         </div>
     </div>
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+            $('#example1').DataTable();
+    </script>
     <script>
         $(document).ready(function() {
             $('.toggle-banner').click(function(e) {

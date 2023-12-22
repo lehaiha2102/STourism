@@ -3,54 +3,39 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title fw-semibold mb-4">Thêm mới phòng</h5>
+                <h5 class="card-title fw-semibold mb-4">Cập nhật bài viết</h5>
                 <div class="card">
                     <div class="card-body">
-                        <form id="room-form" enctype="multipart/form-data">
+                        <form id="post-form" enctype="multipart/form-data">
                             <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Tên phòng</label>
-                                <input type="text" name="room_name" value="{{ $rooms->room_name }}" class="form-control" id="exampleInputEmail1">
-                                <input type="hidden" id="room-slug" value="{{ $rooms->room_slug }}">
+                                <label for="exampleInputEmail1" class="form-label">Tên bài viết</label>
+                                <input type="text" name="title" class="form-control" value="{{$post->title}}" id="exampleInputEmail1">
+                                <input type="hidden" id="post-id" value="{{ $post->id }}">
                             </div>
                 
                             <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Số lượng</label>
-                                <input type="number" name="room_quantity" value="{{ $rooms->room_quantity }}" class="form-control" id="exampleInputEmail1">
-                            </div>
-                            <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Giá phòng</label>
-                                <input type="number" name="room_rental_price" value="{{ $rooms->room_rental_price }}" class="form-control" id="exampleInputEmail1">
-                            </div>
-                            <div class="mb-3">
-                                <label for="disabledSelect12" class="form-label">Thuộc sở hữu</label>
-                                <select id="disabledSelect12" name="product_id" class="form-select">
-                                    @foreach ($products as $product)
-                                        @if ($product->id == $rooms->product_id)
-                                            <option value="{{ $product->id }}" selected>{{ $product->product_name }}</option>
-                                        @else
-                                            <option value="{{ $product->id }}">{{ $product->product_name }}</option>
-                                        @endif
+                                <label for="disabledSelect12" class="form-label">Đối tượng</label>
+                                <select id="disabledSelect12" name="target" class="form-select">
+                                    @foreach($products as $product)
+                                        <option value="{{ $product->id }}" {{ $product->id == $post->target ? 'selected' : '' }}>
+                                            {{ $product->product_name }}
+                                        </option>
                                     @endforeach
-                                </select>
-                            </div>                            
-                            <div class="mb-3">
-                                <label for="exampleInputPassword3" class="form-label">Số lượng người lớn tối đa</label>
-                                <input type="number" name="adult_capacity" value="{{ $rooms->adult_capacity }}" class="form-control" id="exampleInputPassword3">
-                            </div>
-                            <div class="mb-3">
-                                <label for="exampleInputPassword12" class="form-label">Số lượng trẻ em tối đa</label>
-                                <input type="number" name="children_capacity" value="{{ $rooms->children_capacity }}" class="form-control" id="exampleInputPassword12">
-                            </div>
-                            <div class="mb-3">
-                                <label for="exampleInputPassword4" class="form-label">Bộ sưu tập ảnh</label>
-                                <input type="file" name="room_image[]" value="{{ $rooms->room_image }}" multiple class="form-control" id="exampleInputPassword4">
-                                <img id="preview-banner" src="#" alt="Preview" style="display:none; max-width:160px; height:80px;">
+                                </select>                                
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Mô tả</label>
-                                <textarea class="ckeditor form-control" value="{{ $rooms->room_quantity }}" id="editor" name="room_description">{{ $rooms->room_description }}</textarea>
+                                <textarea class="ckeditor  form-control" value="{{$post->description}}" id="editor" name="description">{{$post->description}}</textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary">Thêm mới</button>
+                            <div class="mb-3">
+                                <label class="form-label">Nội dung bài viết</label>
+                                <textarea class="ckeditor form-control" id="editor" value="{{$post->content}}" name="content">{{$post->content}}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Hình ảnh</label>
+                                <input type="file" name="images" multiple class="form-control" value="{{$post->images}}" id="exampleInputEmail1">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
                         </form>
                     </div>
                 </div>
@@ -60,6 +45,18 @@
     <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
     <script>
         CKEDITOR.replace('editor');
+    </script>
+    <script>
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                close: true,
+                backgroundColor: type === 'success' ? '#2ecc71' : '#e74c3c',
+            }).showToast();
+        }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -77,25 +74,34 @@
     </script>
     <script>
         $(document).ready(function () {
-            $('#room-form').on('submit', function (e) {
+            $('#post-form').on('submit', function (e) {
                 e.preventDefault();
-                const roomSlug = $('#room-slug').val();
+                const businessSlug = $('#post-id').val();
                 var formData = new FormData(this);
                 $.ajax({
-                    type: 'POST',
-                    url: '/admin/phong/' + roomSlug + '/cap-nhat',
+                    type: 'post',
+                    url: '/admin/bai-viet/'+businessSlug+'/cap-nhat',
                     data: formData,
-                    processData: false, 
-                    contentType: false, 
+                    processData: false,
+                    contentType: false,
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                         'Accept': 'application/json'
                     },
                     success: function (response) {
                         if (response.status === 'success') {
-                            window.location.href = '/admin/phong';
+                            window.location.href = '/admin/bai-viet?update-success';
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            var errors = xhr.responseJSON.errors;
+                            $.each(errors, function (key, value) {
+                                showToast(value, 'error');
+                            });
                         } else {
-                            alert('Có lỗi trong quá trình thêm mới danh mục. Vui lòng thử lại.');
+                            console.log(xhr)
+                            alert('Có lỗi trong quá trình cập nhật bài viết. Vui lòng thử lại.');
                         }
                     }
                 });

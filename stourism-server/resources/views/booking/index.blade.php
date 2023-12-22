@@ -9,7 +9,7 @@
                         <a href="{{ route('booking.new')  }}" class="btn btn-outline-success m-1 mb-4">Thêm mới</a>
                     </div>
                     <div class="table-responsive">
-                        <table class="table text-nowrap mb-0 align-middle">
+                        <table class="table text-nowrap mb-0 align-middle" id="example10">
                             <thead class="text-dark fs-4">
                             <tr>
                                 <th class="border-bottom-0">
@@ -33,12 +33,17 @@
                                 <th class="border-bottom-0">
                                     <h6 class="fw-semibold mb-0">Trạng thái thanh toán</h6>
                                 </th>
+                                <th class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">Trạng thái đơn đặt chỗ</h6>
+                                </th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($booking as $index => $b)
                                 <tr>
-                                    <td class="border-bottom-0"><h6 class="fw-semibold mb-0">{{ $index + 1 }}</h6></td>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">{{ $index + 1 }}</h6>
+                                    </td>
                                     <td class="border-bottom-0">
                                         <h6 class="fw-semibold mb-1">{{ $b->full_name }}</h6>
                                     </td>
@@ -54,11 +59,16 @@
                                     <td class="border-bottom-0">
                                         <h6 class="fw-semibold mb-1">{{ number_format($b->payment) }}</h6>
                                     </td>
-                                    <td class="border-bottom-0 status-toggle" data-booking-id="{{ $b->id }}" data-status="{{ $b->booking_status }}" >
-                                        {!! $b->payment_check == 1 ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Đã thanh toán</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Chưa thanh toán</span>' !!}
+                                    <td class="border-bottom-0">
+                                        <div class=" status-toggle" data-booking-id="{{ $b->id }}" data-status="{{ $b->booking_status }}" >
+                                            {!! $b->payment_check == 1 ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Đã thanh toán</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Chưa thanh toán</span>' !!}
+                                        </div>
+                                       
                                     </td>
-                                    <td class="border-bottom-0 status-toggle" data-booking-id="{{ $b->id }}" data-status="{{ $b->booking_status }}" >
-                                        {!! $b->booking_status === 'success' ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Đã hoàn thành</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Chưa hoàn thành</span>' !!}
+                                    <td class="border-bottom-0">
+                                        <div class=" status-toggle" data-booking-id="{{ $b->id }}" data-status="{{ $b->booking_status }}">
+                                            {!! $b->booking_status === 'success' ? '<span class="badge bg-success rounded-3 fw-semibold d-flex align-items-center justify-content-center">Đã hoàn thành</span>' : '<span class="badge bg-danger rounded-3 fw-semibold d-flex align-items-center justify-content-center">Chưa hoàn thành</span>' !!}
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -88,4 +98,10 @@
         </div>
     @endforeach
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+            $('#example10').DataTable();
+    </script>
 @endsection
