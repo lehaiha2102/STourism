@@ -107,6 +107,18 @@
             $('#example1').DataTable();
     </script>
     <script>
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                close: true,
+                backgroundColor: type === 'success' ? '#2ecc71' : '#e74c3c',
+            }).showToast();
+        }
+    </script>
+    <script>
         var urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('update-success')) {
             // Hiển thị toast

@@ -10,7 +10,7 @@
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Tên bài viết</label>
                                 <input type="text" name="title" class="form-control" value="{{$post->title}}" id="exampleInputEmail1">
-                                <input type="hidden" id="post-id" value="{{ $post->id }}">
+                                <input type="hidden" name="id" id="post-id" value="{{ $post->id }}">
                             </div>
                 
                             <div class="mb-3">
@@ -76,11 +76,11 @@
         $(document).ready(function () {
             $('#post-form').on('submit', function (e) {
                 e.preventDefault();
-                const businessSlug = $('#post-id').val();
                 var formData = new FormData(this);
+                console.log(formData);
                 $.ajax({
                     type: 'post',
-                    url: '/admin/bai-viet/'+businessSlug+'/cap-nhat',
+                    url: '/admin/bai-viet/cap-nhat',
                     data: formData,
                     processData: false,
                     contentType: false,
@@ -101,7 +101,7 @@
                             });
                         } else {
                             console.log(xhr)
-                            alert('Có lỗi trong quá trình cập nhật bài viết. Vui lòng thử lại.');
+                            showToast('Có lỗi trong quá trình cập nhật bài viết. Vui lòng thử lại.', 'error');
                         }
                     }
                 });

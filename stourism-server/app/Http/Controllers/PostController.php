@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\PostRequest;
+use App\Http\Requests\PostUpdateRequest;
 
 class PostController extends Controller
 {
@@ -74,7 +76,38 @@ class PostController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    public function adminPost(Request $request){
+    public function postUpdate(PostUpdateRequest $request){
+        dd($request);
+        $post = DB::table('post')->where('id', $request->id)->first();
+        $userId = session('user')->id;
+        $uploadImages = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $imageFileName = 'image-'.time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('images'), $imageFileName);
+                $uploadImages[] = $imageFileName;
+            }
+        } else{
+            $uploadImages = $post->images;
+        }
+
+    
+        $post = DB::table('post')->where('id', $request->id)->update([
+            'user' => $userId,
+            'title' => $request->title,
+            'target' => $request->target,
+            'description' => $request->description,
+            'content' => $request->content,
+            'images' => json_encode($uploadImages),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    
+        return response()->json(['status' => 'success']);
+    }
+
+
+    public function adminPost(PostRequest $request){
         $userId = session('user')->id;
         $imageNames = [];
     
@@ -112,4 +145,11 @@ class PostController extends Controller
         $products = DB::table('products')->get();
         return view('post.edit', compact('post', 'products'));
     }
+
+    public function postDetail($id){
+        $post = DB::table('post')->where('id', $id)->first();
+        $products = DB::table('products')->get();
+        return view('post.detail', compact('post', 'products'));
+    }
+
 }

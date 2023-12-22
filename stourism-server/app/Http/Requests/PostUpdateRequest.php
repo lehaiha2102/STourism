@@ -4,8 +4,13 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PostRequest extends FormRequest
+class PostUpdateRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
     public function authorize()
     {
         return true;
@@ -18,7 +23,7 @@ class PostRequest extends FormRequest
             'target' => 'required|exists:products,id',
             'description' => 'required|string',
             'content' => 'required|string',
-            'images' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 
@@ -38,7 +43,6 @@ class PostRequest extends FormRequest
             'content.required' => 'Trường nội dung là bắt buộc.',
             'content.string' => 'Trường nội dung phải là chuỗi.',
             
-            'images.required' => 'Trường hình ảnh là bắt buộc.',
             'images.image' => 'Trường hình ảnh phải là một hình ảnh.',
             'images.mimes' => 'Hình ảnh phải có định dạng: :mimes.',
             'images.max' => 'Kích thước hình ảnh không được vượt quá :max kilobytes.',
