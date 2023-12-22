@@ -64,4 +64,25 @@ class RatingController extends Controller
         $rating = DB::table('rating')->where('booking_id', '=', $bookingId)->first();
         return response()->json(['status' => 'success', 'data' => $rating], 200);
     }
+
+    public function getRatingWithRoomId($room_slug)
+    {
+        $ratings = DB::table('rating')
+        ->join('rooms', 'rooms.id', '=', 'rating.room_id')
+        ->join('users', 'users.id', '=', 'rating.booker')
+        ->where('rooms.room_slug', '=', $room_slug)->get();
+
+        $sumRating = $ratings->count('rating_star');
+
+        $avgRating = $ratings->avg('rating_star');
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'ratings' => $ratings,
+                'sum_rating' => $sumRating,
+                'avg_rating' => $avgRating,
+            ],
+        ], 200);
+    }
 }

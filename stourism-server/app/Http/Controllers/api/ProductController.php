@@ -25,7 +25,9 @@ class ProductController extends Controller
     }
 
     public function getProduct($slug){
-        $data = DB::table('products')->where('product_slug', $slug)->first();
+        $data = DB::table('products')
+        ->join('business', 'products.business_id', '=', 'business.id')
+        ->where('product_slug', $slug)->first();
         return response()->json(['data' => $data]);
     }
 

@@ -47,11 +47,13 @@ class BookingController extends Controller
         $checkoutTime = Carbon::parse($request->checkout);
         $durationInDays = $checkoutTime->diffInDays($checkinTime);
         $totalPayment = $durationInDays * $request->price;
+        $roomId = DB::table('rooms')->where('room_slug', $request->room_id)->value('id');
+
         $booking = DB::table('booking')->insertGetId([
             'booker' => $request->booker,
             'booker_email' => $request->email,
             'booker_phone' => $request->phone,
-            'room_id' => $request->room_id,
+            'room_id' => $roomId,
             'payment' =>  $totalPayment,
             'checkin_time' => $request->checkin,
             'checkout_time' => $request->checkout,
@@ -122,7 +124,7 @@ class BookingController extends Controller
 
         if($booking){
             DB::table('booking')->where('id', $bookingId)->update([
-                'advance_payment_check' => true,
+                'payment_check' => true,
                 'booking_status' => 'success',
             ]);
             $externalUrl = 'http://localhost:3000/lich-su/'.$bookingId;

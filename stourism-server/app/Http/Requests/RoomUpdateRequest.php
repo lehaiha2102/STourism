@@ -14,7 +14,7 @@ class RoomUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'room_name' => 'string|max:255|unique:rooms,room_name',
+            'room_name' => 'string|max:255',
             'product_id' => 'exists:products,id',
             'room_quantity' => 'integer|min:1',
             'adult_capacity' => 'integer|min:1',
@@ -47,7 +47,6 @@ class RoomUpdateRequest extends FormRequest
             'integer' => 'Trường :attribute phải là một số nguyên.',
             'min' => 'Trường :attribute phải có giá trị tối thiểu là :min.',
             'numeric' => 'Trường :attribute phải là một số.',
-            'unique' => 'Trường :attribute đã tồn tại'
         ];
     }
 }

@@ -28,7 +28,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/v2/rating/{bookingId}', [\App\Http\Controllers\RatingController::class, 'getRatingWithBookingIf']);
     Route::post('/v2/post', [\App\Http\Controllers\PostController::class, 'post']);
 });
-Route::post('/v2/login', [AuthController::class, 'login']);
+Route::post('/v2/login', [AuthController::class, 'login'])->name('login');
 Route::post('/v2/register', [AuthController::class, 'register']);
 Route::post('/v2/confirm-email', [AuthController::class, 'confirmEmail']);
 Route::post('/v2/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -43,7 +43,8 @@ Route::get('/v2/products/hotel', [ProductController::class, 'getHotelProductList
 Route::post('/v2/rooms/search', [ProductController::class, 'searchRoom']);
 Route::get('/v2/{slug}/rooms', [RoomController::class, 'getRoom']);
 Route::get('/v2/rooms', [RoomController::class, 'getRoomList']);
-Route::get('/v2/product/{id}/rooms', [RoomController::class, 'getProductRooms']);
+Route::get('/v2/product/{slug}/rooms', [RoomController::class, 'getProductRooms']);
 Route::get('/v2/provice', [LocationController::class, 'getProvinceList']);
 Route::get('/v2/post/{id}', [\App\Http\Controllers\PostController::class, 'getPost']);
 Route::get('/v2/post', [\App\Http\Controllers\PostController::class, 'index']);
+Route::get('/v2/rating-for-room/{room_slug}', [\App\Http\Controllers\RatingController::class, 'getRatingWithRoomId']);

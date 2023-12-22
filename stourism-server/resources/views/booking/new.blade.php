@@ -41,14 +41,14 @@
                             </div>
                             <div class="mb-3">
                                 <label for="disabledSelect" class="form-label">Tình trạng đặt cọc phòng</label>
-                                <select id="disabledSelect" name="advance_payment_check" class="form-select">
+                                <select id="disabledSelect" name="payment_check" class="form-select">
                                     <option value="1">Đã thanh toán</option>
                                     <option value="0">Chưa thanh toán</option>
                                 </select>
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputEmail14" class="form-label">Số tiền cọc trước</label>
-                                <input type="number" name="advance_payment" class="form-control" id="exampleInputEmail14">
+                                <input type="number" name="payment" class="form-control" id="exampleInputEmail14">
                             </div>
                             <button type="submit" class="btn btn-primary">Thêm mới</button>
                         </form>
