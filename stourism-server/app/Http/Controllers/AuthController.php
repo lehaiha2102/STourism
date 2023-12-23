@@ -355,6 +355,37 @@ class AuthController extends Controller
     
         return response()->json(['success' => true, 'message' => 'Cập nhật thông tin thành công']);
     }    
+
+    public function updateProfilePublic(ProfileUpdateRequest $request)
+    {
+        $userId = auth()->id();
+        $imageName = null;
+        $bannerName = null;
+    
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            $image = $request->file('avatar');
+            $imageName = 'image-' . time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+        }
+    
+        if ($request->hasFile('banner') && $request->file('banner')->isValid()) {
+            $image = $request->file('banner');
+            $bannerName = 'banner-' . time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $bannerName);
+        }
+    
+        $dataToUpdate = [
+            'dob' => $request->input('dob'),
+            'address' => $request->input('address'),
+            'phone' => $request->has('phone') ? $request->input('phone') : null,
+            'avatar' => $imageName,
+            'banner' => $bannerName,
+        ];
+    
+        DB::table('users')->where('id', $userId)->update($dataToUpdate);
+    
+        return response()->json(['success' => true, 'message' => 'Cập nhật thông tin thành công']);
+    }   
     
     public function resetPasswordView(){
         if (session()->has('user')) {

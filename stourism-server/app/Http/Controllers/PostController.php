@@ -152,4 +152,11 @@ class PostController extends Controller
         return view('post.detail', compact('post', 'products'));
     }
 
+    public function getMyPost(){
+        $userId = auth()->id();
+        $post = DB::table('post')->where('user', $userId)->paginate(9);
+
+        return response()->json(['status' => 'success', 'data' => $post]);
+    }
+
 }

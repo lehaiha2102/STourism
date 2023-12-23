@@ -198,12 +198,14 @@ class BookingController extends Controller
         }
     }
 
-    public function cancelBooking(Request $request){
-        $booking = DB::table('booking')->where('id', $request->booking_id)->first();
-
+    public function cancelBooking($bookingId)
+    {
+        $userId = auth()->id();
+        $booking = DB::table('booking')->where('id', $bookingId)->where('booker', $userId)->first();
+    
         if ($booking) {
-            DB::table('booking')->where('id', $request->booking_id)->update(['booking_status' => 3]);
-
+            DB::table('booking')->where('id', $bookingId)->update(['booking_status' => 'cancel']);
+    
             return response()->json([
                 'success' => true,
                 'message' => 'Cập nhật trạng thái thành công.'
@@ -214,10 +216,11 @@ class BookingController extends Controller
                 'message' => 'Không tìm thấy danh mục này.'
             ]);
         }
-    }
+    }    
 
-    public function bookingDestroy($bookingId){
-        $booking = DB::table('booking')->where('id', $bookingId)->first();
+    public function bookingDestroy(Request $request){
+        $userId = auth()->id();
+        $booking = DB::table('booking')->where('id', $request->bookingId)->first();
         if($booking){
             DB::table('booking')->where('id', $booking)->delete();
             return response()->json(['status' => 'success']);
@@ -228,29 +231,42 @@ class BookingController extends Controller
 
     public function getAllMyBooking(){
         $userId = auth()->id();
-
+    
         $booking = DB::table('booking')
-        ->join('rooms', 'booking.room_id', '=', 'rooms.id')
-        ->leftJoin('rating', 'booking.id', '=', 'rating.booking_id') // Fixed the join condition
-        ->select('booking.*', 'rating.*', 'rooms.*') // Select all columns from booking, rating, and rooms
-        ->where('booking.booker', '=', $userId)
-        ->where('booking.booking_status', '=', 'success')
+            ->join('rooms', 'booking.room_id', '=', 'rooms.id')
+            ->leftJoin('rating', 'booking.id', '=', 'rating.booking_id')
+            ->select(
+                'booking.id as booking_id',
+                'booking.booker',
+                'booking.booker_email',
+                'booking.booker_phone',
+                'booking.room_id',
+                'booking.payment',
+                'booking.checkin_time',
+                'booking.checkout_time',
+                'booking.created_at as booking_created_at',
+                'booking.updated_at as booking_updated_at',
+                'booking.booking_status',
+                'rating.id as rating_id',
+                'rating.room_id as rating_room_id',
+                'rating.rating_star',
+                'rating.comment',
+                'rating.created_at as rating_created_at',
+                'rating.updated_at as rating_updated_at',
+                'rooms.id as room_id',
+                'rooms.room_name',
+                'rooms.room_rental_price',
+                'rooms.room_description',
+                'rooms.room_image',
+                'rooms.room_slug',
+                'rooms.created_at as room_created_at',
+                'rooms.updated_at as room_updated_at'
+            )
+            ->where('booking.booker', '=', $userId)
+            ->orderBy('booking.checkin_time', 'desc')
             ->get();
+    
         return response()->json(['data' => $booking], 200);
     }
-
-    // public function monthly_revenue(){
-    //     $startDate = Carbon::now()->startOfMonth()->toDateString();
-    //     $endDate = Carbon::now()->endOfMonth()->toDateString();
-    //     $revenue = DB::table('booking')
-    //         ->join('rooms', 'booking.room_id', '=', 'rooms.id')
-    //         ->join('products', 'rooms.product_id', '=', 'products.id')
-    //         ->join('business', 'product.business_id', '=', 'business.id')
-    //         ->where('booking.checkout_time', '>=', $startDate)
-    //         ->where('booking.checkout_time', '<=', $endDate)
-    //         ->where('booking.booking_status', 'completed')
-    //         ->where('booking.payment_check', 1)
-    //         ->sum(DB::raw('booking.payment * 0.85'));
-    //         ->paginate(30);
-    // }
+    
 }
