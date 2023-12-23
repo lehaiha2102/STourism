@@ -59,7 +59,8 @@ const Booking = () => {
         }
     }, [slug]);
 
-    const bookRoom = async () => {
+    const bookRoom = async (e) => {
+        e.preventDefault()
         try {
             const token = localStorage.getItem(StorageKeys.jwt);
             const response = await fetch(`${apiURL}/api/v2/booking`, {
@@ -74,7 +75,7 @@ const Booking = () => {
                     phone: document.getElementById('phone').value,
                     checkin: document.getElementById('checkin').value,
                     checkout: document.getElementById('checkout').value,
-                    room_id: room?.id,
+                    room_id: room?.room_slug,
                     price: room?.room_rental_price,
                 }),
             });
@@ -90,7 +91,6 @@ const Booking = () => {
             console.error('Error when booking:', error);
         }
     };
-
     const truncatedDescription = limit(room?.room_description, 150);
 
     return (
@@ -200,9 +200,6 @@ const Booking = () => {
                             <ul className='mx-3'>
                                 <li>Thời gian đặt phòng phải được thực hiện trước thời gian nhận phòng 12 giờ.</li>
                                 <li>Thời gian nhận phòng phải trước 12 giờ trưa.</li>
-                                <li>Thời gian trả phòng vào lúc 12 giờ trưa. Lưu ý nếu bạn trả phòng muộn, bạn sẽ phải trả thêm phí dịch vụ là 100.000 đ /1 giờ</li>
-                                <li>Trong trường hợp bạn trả phòng sớm hơn dự kiến, chúng tôi không hoàn lại phần tiền thừa.</li>
-                                <li>Việc hủy phòng phải được thực hiện sớm nhất có thể (tối đa 8 giờ sau khi đặt phòng thành công để không mất phí, trong trường hợp còn lại, bạn có thể sẽ mất 5% số tiền phòng đã đặt.)</li>
                             </ul>
                         </div>
                     </div>

@@ -1,14 +1,16 @@
 import Link from 'next/link'
 import Layout from '../components/Layout'
 import { useEffect, useState } from 'react';
-import { log } from 'console';
+import { EstimatedReadingTime } from '../components/EstimatedReadingTime';
 
 function IndexPage() {
   const [categoryList, setCategoryList] = useState([]);
-  const [hotelProductList, setHotelProductList] = useState([]);
   const [provinceList, setProvinceList] = useState([]);
   const [search, setSearch] = useState(null);
-
+  const [post, setPost] = useState([]);
+  const [hotelProductList, setHotelProductList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,10 +34,10 @@ function IndexPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/v2/products/hotel`);
+        const res = await fetch(`http://127.0.0.1:8000/api/v2/post`);
         if (res.ok) {
           const { data } = await res.json();
-          setHotelProductList(data.data);
+          setPost(data.data);
         } else {
           console.error('Error fetching data:', res.statusText);
         }
@@ -44,10 +46,31 @@ function IndexPage() {
       }
     };
 
-    if (hotelProductList.length === 0) {
+    if (categoryList.length === 0) {
       fetchData();
     }
-  }, [hotelProductList]);
+  }, [categoryList]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/api/v2/products/hotel?page=${currentPage}`);
+        if (res.ok) {
+          const { data } = await res.json();
+          setHotelProductList(data.data);
+          setLastPage(data.last_page);
+        } else {
+          console.error('Error fetching data:', res.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error.message);
+      }
+    };
+
+    if (!hotelProductList || hotelProductList.length === 0) {
+      fetchData();
+    }
+  }, [currentPage, hotelProductList]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,7 +90,7 @@ function IndexPage() {
       fetchData();
     }
   }, [provinceList]);
-  
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const selectedProvince = event.target.elements.province.value;
@@ -115,19 +138,19 @@ function IndexPage() {
               <div className="carousel-item active">
                 <img className="w-100" src="../img/carousel-1.jpg" alt="Image" />
                 <div className="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                  <div className="p-3" style={{ maxWidth: '700px' }}>
+                  {/* <div className="p-3" style={{ maxWidth: '700px' }}>
                     <h6 className="section-title text-white text-uppercase mb-3 animated slideInDown">Luxury Living</h6>
                     <h1 className="display-3 text-white mb-4 animated slideInDown">Discover A Brand Luxurious Hotel</h1>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="carousel-item">
                 <img className="w-100" src="../img/carousel-2.jpg" alt="Image" />
                 <div className="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                  <div className="p-3" style={{ maxWidth: '700px' }}>
+                  {/* <div className="p-3" style={{ maxWidth: '700px' }}>
                     <h6 className="section-title text-white text-uppercase mb-3 animated slideInDown">Luxury Living</h6>
                     <h1 className="display-3 text-white mb-4 animated slideInDown">Discover A Brand Luxurious Hotel</h1>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -254,7 +277,13 @@ function IndexPage() {
               <div className="col-lg-6">
                 <h6 className="section-title text-start text-primary text-uppercase">Giới thiệu </h6>
                 <h1 className="mb-4">Chào mừng đến với <span className="text-primary text-uppercase">STravel</span></h1>
-                <p className="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet</p>
+                <p className="mb-4" style={{ textAlign: 'justify' }}>Chào mừng bạn đến với S TRAVEL, website đánh giá nghỉ dưỡng du lịch hàng đầu! Chúng tôi tự hào là địa điểm tốt nhất để bạn khám phá và đặt phòng tại những địa điểm nghỉ dưỡng tuyệt vời trên khắp thế giới.<br /><br />
+
+                  Tại đây, chúng tôi cung cấp cho bạn trải nghiệm đặt phòng trực tuyến thuận lợi, nhanh chóng và an toàn. Với hệ thống đặt phòng thông minh, bạn có thể dễ dàng tìm kiếm và so sánh các lựa chọn phòng, giá cả và tiện ích để chọn ra đúng nơi nghỉ phù hợp với kỳ nghỉ của mình.<br /><br />
+
+                  Ngoài ra, chúng tôi là cộng đồng đánh giá đáng tin cậy, nơi du khách chia sẻ những trải nghiệm thực tế về các địa điểm đã đến. Bạn có thể đọc đánh giá chân thực từ những người đã trải qua và chia sẻ ý kiến của mình để giúp cộng đồng du lịch ngày càng phong phú.
+
+                  Hãy đồng hành cùng chúng tôi để khám phá thế giới và tạo nên những kỷ niệm đáng nhớ tại những điểm đến tuyệt vời nhất!</p>
               </div>
               <div className="col-lg-6">
                 <div className="row g-3">
@@ -282,7 +311,7 @@ function IndexPage() {
               <h1 className="mb-5"><span className="text-primary">Khám phá top các địa điểm nghỉ dưỡng hàng đầu</span></h1>
             </div>
             <div className="row g-4">
-              {hotelProductList ? (
+              {Array.isArray(hotelProductList) && hotelProductList.length > 0 ? (
                 hotelProductList.map((product, index) => (
                   <div
                     className={`col-lg-4 col-md-6 wow fadeInUp`}
@@ -291,24 +320,87 @@ function IndexPage() {
                   >
                     <div className="room-item shadow rounded overflow-hidden">
                       <div className="position-relative">
-                        <img className="img-fluid" src={`http://127.0.0.1:8000/images/${product.product_main_image}`} alt='' />
+                        <img className="img-fluid" style={{height: '200px'}}  src={`http://127.0.0.1:8000/images/${product.product_main_image}`} alt='' />
                       </div>
                       <div className="p-4 mt-2">
                         <div className="d-flex flex-column justify-content-between mb-3">
-                        <h5 className="mb-0 w-100 text-center">{product.product_name}</h5>
-                          <div className="d-flex justify-content-center my-3">
-                            <small className="fa fa-star text-primary"></small>
-                            <small className="fa fa-star text-primary"></small>
-                            <small className="fa fa-star text-primary"></small>
-                            <small className="fa fa-star text-primary"></small>
-                            <small className="fa fa-star text-primary"></small>
-                          </div>
+                          <h5 className="mb-0 w-100 text-center">{product.product_name}</h5>
                         </div>
                         <p className="text-body mb-3"><i className="fa fa-map-marker-alt me-3"></i>{product.product_address}</p>
                         <p className="text-body mb-3"><i className="fa fa-phone-alt me-3"></i> {product.product_phone}</p>
                         <div className="d-flex justify-content-center">
                           <Link className="btn btn-sm btn-primary rounded py-2 px-4"
                             href={`/san-pham/${product.product_slug}`}>Xem chi tiết</Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>Loading...</p>
+              )}
+            </div>
+            <div className="text-center wow fadeInUp mt-5" data-wow-delay="0.1s">
+              <nav aria-label="Page navigation">
+                <ul className="pagination justify-content-center">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <span className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>
+                      Trước
+                    </span>
+                  </li>
+
+                  {Array.from(Array(lastPage).keys()).map((page) => (
+                    <li key={page + 1} className={`page-item ${currentPage === page + 1 ? 'active' : ''}`}>
+                      <span className="page-link" onClick={() => setCurrentPage(page + 1)}>
+                        {page + 1}
+                      </span>
+                    </li>
+                  ))}
+                  <li className={`page-item ${currentPage === lastPage ? 'disabled' : ''}`}>
+                    <span className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>
+                      Tiếp theo
+                    </span>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+        <div className="container-xxl py-5">
+          <div className="container">
+            <div className="text-center wow fadeInUp" data-wow-delay="0.1s">
+              <h6 className="section-title text-center text-primary text-uppercase">Bài viết</h6>
+            </div>
+            <div className="row g-4">
+              {post ? (
+                post.map((post_item, index) => (
+                  <div
+                    className={`col-lg-4 col-md-6 wow fadeInUp`}
+                    data-wow-delay={`${0.1 * (index + 1)}s`}
+                    key={index}
+                  >
+                    <div className="room-item shadow rounded overflow-hidden">
+                      <div className="position-relative">
+                        {post_item.images && post_item.images.length > 0 && (
+                          <img
+                            className="img-fluid rounded w-100 wow zoomIn"
+                            src={`http://127.0.0.1:8000/images/${JSON.parse(post_item.images)[0]}`}
+                            alt=''
+                            data-wow-delay="0.1s"
+                            style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'zoomIn', maxHeight: 200 }}
+                          />
+                        )}
+                      </div>
+                      <div className="p-4 mt-2">
+                        <div className="d-flex flex-column justify-content-between mb-3">
+                          <h5 className="mb-0 w-100 text-center">{post_item.title}</h5>
+                        </div>
+                        <p className="text-body mb-3">{post_item.description}</p>
+                        <p className='text-body mb-3'>Ước tính thời gian đọc:{EstimatedReadingTime(post_item.content)} phút</p>
+                        <p className="text-body mb-3">Cập nhật gần nhất: {post_item.updated_at}</p>
+                        <div className="d-flex justify-content-center">
+                          <Link className="btn btn-sm btn-primary rounded py-2 px-4"
+                            href={`/bai-viet/${post_item.id}`}>Xem chi tiết</Link>
                         </div>
                       </div>
                     </div>

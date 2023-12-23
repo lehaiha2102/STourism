@@ -27,6 +27,12 @@ const BookingHistory = () => {
     const [newRating, setNewRating] = useState(5);
     const [valueRating, setvalueRating] = useState<IRating>();
     const [isRating, setIsRating] = useState(false);
+    const [comment, setComment] = useState('');
+
+    // Hàm xử lý sự kiện thay đổi của input comment
+    const handleCommentChange = (event) => {
+        setComment(event.target.value);
+    };
 
     const handleRatingChange = (updateRating) => {
         setNewRating(updateRating);
@@ -76,14 +82,16 @@ const BookingHistory = () => {
                     booking_id: id,
                     room_id: rooms.id,
                     rating_star: valueRating ? valueRating.rating_star : newRating,
-                    comment: "Nội dung bình luận",
+                    comment: comment,
                 }),
             });
 
             if (response.ok) {
                 console.log('Đánh giá đã được gửi thành công!');
+                handleClose();
             } else {
                 // Xử lý lỗi
+
                 console.error('Đã có lỗi khi gửi đánh giá:', response);
             }
         } catch (error) {
@@ -105,8 +113,10 @@ const BookingHistory = () => {
 
                 if (res.ok) {
                     const { data } = await res.json();
-                    setIsRating(true);
-                    setvalueRating(data);
+                    if (data) {
+                        setIsRating(true);
+                        setvalueRating(data);
+                    }
 
                 } else {
                     console.error('Error fetching data:', res.statusText);
@@ -144,7 +154,7 @@ const BookingHistory = () => {
                     <div className="row g-5">
                         <div className="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.1s" style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'fadeInUp' }}>
                             <div className="rounded shadow overflow-hidden row py-5">
-                                <div className="col-lg-3 col-md-3 col-12 d-flex justify-content-center align-items-center">
+                                <div className="col-lg-3 col-md-3 col-12 d-flex flex-column justify-content-center align-items-center">
                                     {rooms.room_image && rooms.room_image.length > 0 && (
                                         <img
                                             className="img-fluid rounded w-100 wow zoomIn"
@@ -153,8 +163,9 @@ const BookingHistory = () => {
                                             style={{ visibility: 'visible', animationDelay: '0.1s', animationName: 'zoomIn' }}
                                         />
                                     )}
+                                    <Link className="btn btn-primary w-100 py-3 my-3" href={`/phong/${rooms?.room_slug || ''}`}>Xem lại phòng</Link>
                                 </div>
-                                <div className="col-lg-6 col-md-6 col-12 flex-column">
+                                <div className="col-lg-9 col-md-9 col-12 flex-column">
                                     <div className='d-flex flex-column'>
                                         <h3 className="px-5 text-primary">{rooms.room_name}</h3>
                                         <span className="w-100 px-5 mb-5 font-weight-bold">Giá phòng:<PriceFormatter price={rooms.room_rental_price} />/1 ngày</span>
@@ -165,20 +176,14 @@ const BookingHistory = () => {
                                         <span className="col-lg-6 col-md-6 col-12">{booking.checkin_time}</span>
                                         <span className="col-lg-6 col-md-6 col-12">Thời gian trả phòng</span>
                                         <span className="col-lg-6 col-md-6 col-12">{booking.checkout_time}</span>
-                                        <span className="col-lg-6 col-md-6 col-12">Số tiền cần thanh toán trước</span>
-                                        <span className="col-lg-6 col-md-6 col-12"><PriceFormatter price={booking.advance_payment} /></span>
+                                        <span className="col-lg-6 col-md-6 col-12">Số tiền đã thanh toán</span>
+                                        <span className="col-lg-6 col-md-6 col-12"><PriceFormatter price={booking.payment} /></span>
                                         <span className="col-lg-6 col-md-6 col-12">Trạng thái</span>
                                         <span className="col-lg-6 col-md-6 col-12">{booking.booking_status === 'success' ? 'Thanh toán thành công' : 'Giao dịch đang được xử lý'}</span>
-                                        {new Date() > new Date(booking.checkout_time) && (
-                                            <button className="btn btn-primary mt-3" onClick={handleShow}>Đánh giá</button>
-                                        )}
                                     </div>
-                                </div>
-                                <div className="col-md-3 flex-column mt-3 justify-content-center align-items-center">
-                                    <div className='w-100 d-flex justifi-content-center mb-3'>
-                                        <MyQRCodeComponent link={link} />
-                                    </div>
-                                    <Link className="btn btn-primary w-100 py-3" href={`/phong/${rooms?.room_slug || ''}`}>Xem lại phòng</Link>
+                                    {new Date() > new Date(booking.checkout_time) && (
+                                        <button className="btn btn-primary mt-3" onClick={handleShow}>Đánh giá</button>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -221,13 +226,13 @@ const BookingHistory = () => {
                     <div className='d-flex flex-column'>
                         <span>Bình luận về phòng</span>
                         {valueRating ? <strong className='text-justify'>{valueRating.comment}</strong> :
-                            <input type='text' name='comment' />}
+                            <input type='text' name='comment' value={comment} onChange={handleCommentChange} />}
                     </div>
                     <input type='hidden' name='booking_id' value={id} />
                     <input type='hidden' name='room_id' value={rooms.id} />
                 </Modal.Body>
-                {isRating ? '' :
-                    <Modal.Footer>
+                {isRating == true ? '' :
+                    <Modal.Footer className='d-flex justify-content-center'>
                         <Button variant="secondary" onClick={handleClose}>
                             Hủy
                         </Button>

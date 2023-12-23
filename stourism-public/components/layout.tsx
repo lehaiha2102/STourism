@@ -42,7 +42,7 @@ const Layout = ({ children }: Props) => {
         <script src="/js/main.js"></script>
       </Head>
       <Header/>
-      <div  className='bg-white'>
+      <div  className='bg-white d-flex flex-column align-items-center justify-content-center'>
         {children}
       </div>
       <Footer />
